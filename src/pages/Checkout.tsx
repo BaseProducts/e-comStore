@@ -14,7 +14,7 @@ import {
 import { useCart } from "../context/CartContext";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, authHeaders } from "@/lib/utils";
 
 const Checkout = () => {
     const navigate = useNavigate();
@@ -63,12 +63,11 @@ const Checkout = () => {
         setIsProcessing(true);
         
         try {
-            const token = localStorage.getItem("token");
             const response = await fetch(`${BASE_URL}/api/orders`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    ...authHeaders()
                 },
                 body: JSON.stringify({
                     ...formData,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { BASE_URL } from "@/lib/utils";
+import { BASE_URL, authHeaders } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -170,7 +170,9 @@ const AdminPanel = () => {
 
     const fetchStats = async () => {
         try {
-            const response = await fetch(`${BASE_URL}/api/orders/admin/stats`);
+            const response = await fetch(`${BASE_URL}/api/orders/admin/stats`, {
+                headers: { ...authHeaders() }
+            });
             const data = await response.json();
             if (data && !data.status) {
                 setStats(data);
@@ -182,7 +184,9 @@ const AdminPanel = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(CATEGORIES_API);
+            const response = await fetch(CATEGORIES_API, {
+                headers: { ...authHeaders() }
+            });
             const data = await response.json();
             if (Array.isArray(data)) {
                 setCategories(data);
@@ -218,7 +222,9 @@ const AdminPanel = () => {
 
     const fetchMessages = async () => {
         try {
-            const response = await fetch(MESSAGES_API);
+            const response = await fetch(MESSAGES_API, {
+                headers: { ...authHeaders() }
+            });
             const data = await response.json();
             if (Array.isArray(data)) {
                 setMessages(data);
@@ -234,7 +240,9 @@ const AdminPanel = () => {
 
     const fetchCustomers = async () => {
         try {
-            const response = await fetch(USERS_API);
+            const response = await fetch(USERS_API, {
+                headers: { ...authHeaders() }
+            });
             const data = await response.json();
             if (Array.isArray(data)) {
                 setCustomers(data);
@@ -278,6 +286,9 @@ const AdminPanel = () => {
 
             const response = await fetch(url, {
                 method: method,
+                headers: {
+                    ...authHeaders()
+                },
                 body: formData,
             });
 
@@ -341,7 +352,9 @@ const AdminPanel = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(PRODUCTS_API);
+            const response = await fetch(PRODUCTS_API, {
+                headers: { ...authHeaders() }
+            });
             const data = await response.json();
             if (Array.isArray(data)) {
                 setProducts(data);
@@ -358,6 +371,9 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${PRODUCTS_API}/${id}/toggle-visibility`, {
                 method: "PATCH",
+                headers: {
+                    ...authHeaders()
+                }
             });
 
             if (response.ok) {
@@ -377,6 +393,9 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${PRODUCTS_API}/${id}`, {
                 method: "DELETE",
+                headers: {
+                    ...authHeaders()
+                }
             });
 
             if (response.ok) {
@@ -398,7 +417,10 @@ const AdminPanel = () => {
         try {
             const response = await fetch(CATEGORIES_API, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    ...authHeaders()
+                },
                 body: JSON.stringify({ name: newCategoryName }),
             });
 
@@ -424,7 +446,10 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${CATEGORIES_API}/${editingCategory.id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    ...authHeaders()
+                },
                 body: JSON.stringify({ name: editingCategory.name }),
             });
 
@@ -448,6 +473,9 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${CATEGORIES_API}/${id}`, {
                 method: "DELETE",
+                headers: {
+                    ...authHeaders()
+                }
             });
 
             if (response.ok) {
@@ -473,6 +501,9 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${MESSAGES_API}/${id}`, {
                 method: "DELETE",
+                headers: {
+                    ...authHeaders()
+                }
             });
 
             if (response.ok) {
@@ -492,6 +523,9 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${USERS_API}/${id}`, {
                 method: "DELETE",
+                headers: {
+                    ...authHeaders()
+                }
             });
 
             if (response.ok) {
@@ -509,7 +543,8 @@ const AdminPanel = () => {
         try {
             const response = await fetch(`${BASE_URL}/api/orders`, {
                 headers: {
-                    "Cache-Control": "no-cache"
+                    "Cache-Control": "no-cache",
+                    ...authHeaders()
                 }
             });
             const data = await response.json();
@@ -527,7 +562,8 @@ const AdminPanel = () => {
             const response = await fetch(`${BASE_URL}/api/orders/${id}/status`, {
                 method: "PATCH",
                 headers: { 
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    ...authHeaders()
                 },
                 body: JSON.stringify({ status })
             });
@@ -545,7 +581,10 @@ const AdminPanel = () => {
         if (!confirm("Permanently delete this order?")) return;
         try {
             const response = await fetch(`${BASE_URL}/api/orders/${id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: {
+                    ...authHeaders()
+                }
             });
 
             if (response.ok) {

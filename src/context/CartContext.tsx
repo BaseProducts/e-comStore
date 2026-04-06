@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { BASE_URL } from '@/lib/utils';
+import { BASE_URL, authHeaders } from '@/lib/utils';
 
 interface Product {
   id: string;
@@ -48,7 +48,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Add timestamp to query to prevent browser caching (304 issues)
       const res = await fetch(`${BASE_URL}/api/cart?t=${Date.now()}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          ...authHeaders(),
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
         },
@@ -86,7 +86,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          ...authHeaders(),
         },
         body: JSON.stringify({ productId, size, quantity }),
       });
@@ -122,7 +122,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          ...authHeaders(),
         },
         body: JSON.stringify({ quantity }),
       });
@@ -154,7 +154,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await fetch(`${BASE_URL}/api/cart/remove/${itemId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          ...authHeaders(),
         },
       });
 
