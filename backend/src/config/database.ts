@@ -1,9 +1,10 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
+import pg from 'pg'; // 👈 IMPORTANT (ESM compatible)
 
 dotenv.config();
 
-// ✅ Use DATABASE_URL instead of individual DB vars
+// ✅ Use DATABASE_URL
 const databaseUrl = process.env.DATABASE_URL as string;
 
 if (!databaseUrl) {
@@ -13,15 +14,12 @@ if (!databaseUrl) {
 
 const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres',
-  logging: (msg) => {
-    if (msg.includes('ERROR') || msg.includes('Failed')) {
-      console.error('DB_LOG: ', msg);
-    }
-  },
+  dialectModule: pg, // 👈 FIXES SSL issue properly
+  logging: false,
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // required for Supabase
+      rejectUnauthorized: false, // 👈 FIXES "self-signed certificate" error
     },
   },
   pool: {
@@ -37,7 +35,7 @@ export const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ Connected to Supabase PostgreSQL');
 
-    // ✅ SAFE TABLE CREATION (no destructive drop)
+    // ✅ SAFE TABLE CREATION
     try {
       await sequelize.query(`
         CREATE TABLE IF NOT EXISTS "Settings" (
