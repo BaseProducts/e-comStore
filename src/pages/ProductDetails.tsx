@@ -5,6 +5,7 @@ import { ShoppingBag, ChevronRight, Package, ArrowLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
+import { BASE_URL } from "@/lib/utils";
 
 interface Product {
     id: string;
@@ -33,7 +34,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await fetch(`/api/products/${id}`);
+                const res = await fetch(`${BASE_URL}/api/products/${id}`);
                 if (res.ok) {
                     const data = await res.json();
                     setProduct(data);

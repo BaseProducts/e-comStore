@@ -5,6 +5,7 @@ import { Mail, Lock, User, ArrowRight, ShieldCheck, ArrowLeft } from "lucide-rea
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import { useCart } from "../context/CartContext";
+import { BASE_URL } from "@/lib/utils";
 
 type AuthMode = "login" | "signup" | "otp";
 
@@ -25,7 +26,7 @@ const Auth = () => {
 
         try {
             if (mode === "login" || mode === "signup") {
-                const res = await fetch("/api/auth/request-otp", {
+                const res = await fetch(`${BASE_URL}/api/auth/request-otp`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, fullName, mode })
@@ -40,7 +41,7 @@ const Auth = () => {
                 }
             }
             else if (mode === "otp") {
-                const res = await fetch("/api/auth/verify-otp", {
+                const res = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, otp, fullName })

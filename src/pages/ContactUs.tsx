@@ -4,6 +4,7 @@ import { Send, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { BASE_URL } from "@/lib/utils";
 
 const ContactUs = () => {
     const [formData, setFormData] = useState({
@@ -46,7 +47,7 @@ const ContactUs = () => {
         setIsSubmitting(true);
 
         try {
-            const res = await fetch("/api/contact", {
+            const res = await fetch(`${BASE_URL}/api/contact`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

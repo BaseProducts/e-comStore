@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Package } from "lucide-react";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "@/lib/utils";
 
 export interface Product {
   id: string;
@@ -16,7 +17,7 @@ export interface Product {
   stock: number;
 }
 
-const PRODUCTS_API = "/api/products";
+const PRODUCTS_API = `${BASE_URL}/api/products`;
 
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);

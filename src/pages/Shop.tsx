@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Search, Filter, SlidersHorizontal, ChevronDown, Package, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { BASE_URL } from "@/lib/utils";
 
 interface Product {
     id: string;
@@ -21,8 +22,8 @@ interface Category {
     name: string;
 }
 
-const PRODUCTS_API = "/api/products";
-const CATEGORIES_API = "/api/categories";
+const PRODUCTS_API = `${BASE_URL}/api/products`;
+const CATEGORIES_API = `${BASE_URL}/api/categories`;
 
 const Shop = () => {
     const [products, setProducts] = useState<Product[]>([]);

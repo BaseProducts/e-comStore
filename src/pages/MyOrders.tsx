@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ShoppingBag, ChevronRight, Package, Truck, CheckCircle, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { BASE_URL } from "@/lib/utils";
 
 interface OrderItem {
     id: string;
@@ -34,7 +35,7 @@ const MyOrders = () => {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:8080/api/orders/user", {
+            const response = await fetch(`${BASE_URL}/api/orders/user`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }

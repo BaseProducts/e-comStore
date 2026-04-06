@@ -14,6 +14,7 @@ import {
 import { useCart } from "../context/CartContext";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
+import { BASE_URL } from "@/lib/utils";
 
 const Checkout = () => {
     const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Checkout = () => {
         
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("/api/orders", {
+            const response = await fetch(`${BASE_URL}/api/orders`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

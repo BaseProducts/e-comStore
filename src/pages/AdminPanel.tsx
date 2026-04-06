@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { BASE_URL } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -128,10 +129,10 @@ const AdminPanel = () => {
     const [productImages, setProductImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
-    const CATEGORIES_API = "/api/categories";
-    const PRODUCTS_API = "/api/products";
-    const MESSAGES_API = "/api/contact";
-    const USERS_API = "/api/users";
+    const CATEGORIES_API = `${BASE_URL}/api/categories`;
+    const PRODUCTS_API = `${BASE_URL}/api/products`;
+    const MESSAGES_API = `${BASE_URL}/api/contact`;
+    const USERS_API = `${BASE_URL}/api/users`;
 
     const AVAILABLE_SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "Free Size"];
 
@@ -169,7 +170,7 @@ const AdminPanel = () => {
 
     const fetchStats = async () => {
         try {
-            const response = await fetch("/api/orders/admin/stats");
+            const response = await fetch(`${BASE_URL}/api/orders/admin/stats`);
             const data = await response.json();
             if (data && !data.status) {
                 setStats(data);
@@ -506,8 +507,10 @@ const AdminPanel = () => {
 
     const fetchOrders = async () => {
         try {
-            const response = await fetch("/api/orders", {
-                headers: { "Cache-Control": "no-cache" }
+            const response = await fetch(`${BASE_URL}/api/orders`, {
+                headers: {
+                    "Cache-Control": "no-cache"
+                }
             });
             const data = await response.json();
             if (Array.isArray(data)) {
@@ -521,7 +524,7 @@ const AdminPanel = () => {
 
     const handleUpdateOrderStatus = async (id: string, status: string) => {
         try {
-            const response = await fetch(`/api/orders/${id}/status`, {
+            const response = await fetch(`${BASE_URL}/api/orders/${id}/status`, {
                 method: "PATCH",
                 headers: { 
                     "Content-Type": "application/json"
@@ -541,7 +544,7 @@ const AdminPanel = () => {
     const handleDeleteOrder = async (id: string) => {
         if (!confirm("Permanently delete this order?")) return;
         try {
-            const response = await fetch(`/api/orders/${id}`, {
+            const response = await fetch(`${BASE_URL}/api/orders/${id}`, {
                 method: "DELETE"
             });
 
