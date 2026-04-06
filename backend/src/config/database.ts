@@ -3,15 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const dbName = process.env.DB_NAME as string;
-const dbUser = process.env.DB_USER as string;
-const dbHost = process.env.DB_HOST as string;
-const dbPassword = process.env.DB_PASSWORD as string;
-const dbPort = parseInt(process.env.DB_PORT || '5432');
+// ✅ Use DATABASE_URL instead of individual DB vars
+const databaseUrl = process.env.DATABASE_URL as string;
 
-const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
-  host: dbHost,
-  port: dbPort,
+if (!databaseUrl) {
+  console.error("❌ DATABASE_URL is not defined in environment variables");
+  process.exit(1);
+}
+
+const sequelize = new Sequelize(databaseUrl, {
   dialect: 'postgres',
   logging: (msg) => {
     if (msg.includes('ERROR') || msg.includes('Failed')) {
@@ -21,13 +21,13 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // Required for Supabase
+      rejectUnauthorized: false, // required for Supabase
     },
   },
   pool: {
-    max: 10, // Increased pool size
+    max: 10,
     min: 2,
-    acquire: 60000, 
+    acquire: 60000,
     idle: 30000,
   },
 });
@@ -35,13 +35,12 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Connection to Supabase PostgreSQL has been established successfully.');
-    
-    // Ensure CartItems table exists via raw SQL (bypasses Sequelize constraint issues)
+    console.log('✅ Connected to Supabase PostgreSQL');
+
+    // ✅ SAFE TABLE CREATION (no destructive drop)
     try {
       await sequelize.query(`
-        DROP TABLE IF EXISTS "Settings" CASCADE;
-        CREATE TABLE "Settings" (
+        CREATE TABLE IF NOT EXISTS "Settings" (
           "key" VARCHAR(255) PRIMARY KEY,
           "value" TEXT NOT NULL,
           "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -81,27 +80,28 @@ export const connectDB = async () => {
           "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
       `);
-      console.log('E-commerce tables ensured.');
-    } catch (cartTableError: any) {
-      console.error('CartItems table creation note:', cartTableError.message);
+
+      console.log('✅ E-commerce tables ensured');
+    } catch (tableError: any) {
+      console.error('⚠️ Table creation issue:', tableError.message);
     }
 
-    // Sync other models (safe sync - won't fail on existing tables)
+    // ✅ Sync models
     try {
       await sequelize.sync({ alter: true });
-      console.log('Database synchronization complete.');
+      console.log('✅ Database synchronization complete');
     } catch (syncError: any) {
-      // If alter fails (constraint issues), try plain sync as fallback
-      console.warn('Alter sync failed, trying plain sync:', syncError.message);
+      console.warn('⚠️ Alter sync failed, trying plain sync:', syncError.message);
       try {
         await sequelize.sync();
-        console.log('Database synchronization complete (plain sync).');
+        console.log('✅ Database synchronization complete (plain sync)');
       } catch (plainSyncError: any) {
-        console.error('Plain sync also failed:', plainSyncError.message);
+        console.error('❌ Plain sync failed:', plainSyncError.message);
       }
     }
+
   } catch (error: any) {
-    console.error('Unable to connect to the database:', error.message);
+    console.error('❌ Unable to connect to the database:', error.message);
     console.error(error.stack);
     process.exit(1);
   }
