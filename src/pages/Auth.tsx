@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, User, ArrowRight, ShieldCheck, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
 import { useCart } from "../context/CartContext";
 import { BASE_URL } from "@/lib/utils";
 
-type AuthMode = "login" | "signup" | "otp";
+type AuthMode = "login" | "signup";
 
 const Auth = () => {
     const navigate = useNavigate();
@@ -17,34 +17,36 @@ const Auth = () => {
     
     // Form States
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");
-    const [otp, setOtp] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            if (mode === "login" || mode === "signup") {
-                const res = await fetch(`${BASE_URL}/api/auth/request-otp`, {
+            if (mode === "signup") {
+                const res = await fetch(`${BASE_URL}/api/auth/signup`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, fullName, mode })
+                    body: JSON.stringify({ email, password, fullName })
                 });
                 
                 const data = await res.json();
-                if (data.status === "otp_required") {
-                    toast.success(mode === "signup" ? "Account created! Check your email for verification code." : "Check your email for the login code!");
-                    setMode("otp");
+                if (data.status === "success") {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
+                    await refreshCart();
+                    toast.success("Account created successfully! Welcome.");
+                    navigate("/");
                 } else {
-                    toast.error(data.message || "Failed to process request");
+                    toast.error(data.message || "Failed to create account");
                 }
-            }
-            else if (mode === "otp") {
-                const res = await fetch(`${BASE_URL}/api/auth/verify-otp`, {
+            } else {
+                const res = await fetch(`${BASE_URL}/api/auth/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, otp, fullName })
+                    body: JSON.stringify({ email, password })
                 });
 
                 const data = await res.json();
@@ -52,10 +54,10 @@ const Auth = () => {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
                     await refreshCart();
-                    toast.success("Email verified successfully! Welcome.");
+                    toast.success("Login successful! Welcome back.");
                     navigate("/");
                 } else {
-                    toast.error(data.message || "Invalid OTP code");
+                    toast.error(data.message || "Invalid credentials");
                 }
             }
         } catch (error) {
@@ -81,7 +83,6 @@ const Auth = () => {
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
                                 {mode === "login" && "Access Your Account"}
                                 {mode === "signup" && "Join The Movement"}
-                                {mode === "otp" && "Verify Your Identity"}
                             </p>
                         </div>
 
@@ -114,49 +115,40 @@ const Auth = () => {
                                     </div>
                                 )}
 
-                                {(mode === "login" || mode === "signup") && (
-                                    <>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Email Address</label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-                                                    <Mail size={16} />
-                                                </div>
-                                                <input 
-                                                    type="email" 
-                                                    required
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    className="w-full bg-background border border-border rounded pl-10 pr-3 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                                                    placeholder="john@example.com"
-                                                />
-                                            </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Email Address</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                                            <Mail size={16} />
                                         </div>
-                                    </>
-                                )}
-
-                                {mode === "otp" && (
-                                    <div className="space-y-6 text-center">
-                                        <div className="w-16 h-16 bg-muted/30 rounded-full flex mx-auto items-center justify-center border border-border">
-                                            <ShieldCheck size={32} className="text-primary" />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-sm">We've sent a 6-digit code to</p>
-                                            <p className="text-sm font-bold text-primary">{email}</p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <input 
-                                                type="text" 
-                                                required
-                                                maxLength={6}
-                                                value={otp}
-                                                onChange={(e) => setOtp(e.target.value)}
-                                                className="w-full bg-background border border-border rounded p-4 text-center text-xl font-bold tracking-[0.5em] focus:outline-none focus:border-primary transition-colors"
-                                                placeholder="000000"
-                                            />
-                                        </div>
+                                        <input 
+                                            type="email" 
+                                            required
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full bg-background border border-border rounded pl-10 pr-3 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                                            placeholder="john@example.com"
+                                        />
                                     </div>
-                                )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Password</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                                            <Lock size={16} />
+                                        </div>
+                                        <input 
+                                            type="password" 
+                                            required
+                                            minLength={6}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full bg-background border border-border rounded pl-10 pr-3 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                </div>
 
                                 <button 
                                     type="submit" 
@@ -169,7 +161,6 @@ const Auth = () => {
                                         <>
                                             {mode === "login" && "Sign In"}
                                             {mode === "signup" && "Create Account"}
-                                            {mode === "otp" && "Verify Code"}
                                             <ArrowRight size={16} />
                                         </>
                                     )}
@@ -193,11 +184,6 @@ const Auth = () => {
                                         Sign In
                                     </button>
                                 </p>
-                            )}
-                            {mode === "otp" && (
-                                <button onClick={() => setMode("login")} className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary flex items-center justify-center gap-1 mx-auto transition-colors">
-                                    <ArrowLeft size={12} /> Back to Sign In
-                                </button>
                             )}
                         </div>
                     </div>

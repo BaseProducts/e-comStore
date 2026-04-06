@@ -15,7 +15,6 @@ import userRoutes from './routes/user.routes.js';
 import cartRoutes from './routes/cart.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import orderRoutes from './routes/order.routes.js';
-import './models/Otp.js'; 
 import './models/CartItem.js';
 import './models/Setting.js';
 import './models/Order.js';

@@ -5,6 +5,7 @@ import sequelize from '../config/database.js';
 interface UserAttributes {
   id: string;
   email: string;
+  password?: string;
   fullName: string;
   googleId?: string;
   avatarUrl?: string;
@@ -13,11 +14,12 @@ interface UserAttributes {
   updatedAt?: Date;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'googleId' | 'avatarUrl' | 'role'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'password' | 'googleId' | 'avatarUrl' | 'role'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   declare public id: string;
   declare public email: string;
+  declare public password?: string;
   declare public fullName: string;
   declare public googleId?: string;
   declare public avatarUrl?: string;
@@ -41,6 +43,10 @@ User.init(
       validate: {
         isEmail: true,
       },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     fullName: {
       type: DataTypes.STRING,
