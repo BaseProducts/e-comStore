@@ -65,19 +65,26 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     }, 0);
 
     let frontendUrl = process.env.FRONTEND_URL;
+    const nodeEnv = process.env.NODE_ENV;
+
+    console.log(`[Stripe Debug] process.env.FRONTEND_URL: ${frontendUrl || 'undefined'}`);
+    console.log(`[Stripe Debug] process.env.NODE_ENV: ${nodeEnv || 'undefined'}`);
 
     // Production Safeguard: Never fall back to localhost in production
-    if (process.env.NODE_ENV === 'production') {
+    if (nodeEnv === 'production') {
       if (!frontendUrl || frontendUrl.includes('localhost') || frontendUrl.includes('127.0.0.1')) {
         console.error('❌ CRITICAL: FRONTEND_URL is missing or set to localhost in production environment!');
         throw new Error('Server configuration error: FRONTEND_URL must be set to the deployed URL in production.');
       }
     } else {
-      // Development fallback
-      frontendUrl = frontendUrl || 'http://localhost:5173';
+      // In development/test, we allow fallback if not provided
+      if (!frontendUrl) {
+        frontendUrl = 'http://localhost:5173';
+        console.log(`[Stripe Debug] Using development fallback URL: ${frontendUrl}`);
+      }
     }
 
-    console.log(`[Stripe] Creating checkout session. Redirecting to: ${frontendUrl}`);
+    console.log(`[Stripe] Checkout Session Target URL: ${frontendUrl}`);
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
