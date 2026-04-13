@@ -103,17 +103,22 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
 export const handleWebhook = async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'];
 
+  // Log incoming webhook for debugging
+  console.log(`[Stripe Webhook] Received event: ${req.headers['stripe-signature'] ? 'Has Signature' : 'No Signature'}`);
+
   let event: Stripe.Event;
 
   try {
     if (!sig || Array.isArray(sig) || !endpointSecret) {
+      console.error('❌ Missing signature or webhook secret');
       throw new Error('Missing or invalid stripe-signature or webhook secret');
     }
 
     // req.body is raw Buffer here (thanks to express.raw middleware in server.ts)
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    console.log(`[Stripe Webhook] Event Type: ${event.type}`);
   } catch (err: any) {
-    console.error(`Webhook signature verification failed: ${err.message}`);
+    console.error(`❌ Webhook signature verification failed: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
