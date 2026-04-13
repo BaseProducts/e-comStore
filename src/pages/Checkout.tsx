@@ -60,7 +60,7 @@ const Checkout = () => {
         
         try {
             // Create a Stripe Checkout Session on the backend
-            const response = await fetch(`${BASE_URL}/api/checkout/create-session`, {
+            const response = await fetch(`${BASE_URL}/api/stripe/create-session`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
