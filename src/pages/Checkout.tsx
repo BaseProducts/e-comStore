@@ -75,7 +75,7 @@ const Checkout = () => {
                 // Redirect to Stripe Checkout page
                 window.location.href = result.url;
             } else {
-                toast.error(result.message || "Failed to initiate payment");
+                toast.error(result.error || result.message || "Failed to initiate payment");
             }
         } catch (error) {
             toast.error("Connection error. Please try again.");

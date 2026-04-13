@@ -44,7 +44,7 @@ const PORT = Number(process.env.PORT) || 5000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+  origin: [process.env.CORS_ORIGIN || "*", "https://baseproducts.online"],
   credentials: true,
 }));
 app.use(morgan('dev'));

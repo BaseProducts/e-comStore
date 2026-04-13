@@ -64,7 +64,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       return sum + price * item.quantity;
     }, 0);
 
-    const frontendUrl = process.env.FRONTEND_URL;
+    // HARDCODED FALLBACK as requested by user to fix persistent deployment issues
+    const frontendUrl = process.env.FRONTEND_URL || "https://baseproducts.online";
     const nodeEnv = process.env.NODE_ENV;
     
     // Diagnostic logging for production debugging
@@ -76,16 +77,9 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       console.log(`[Stripe Diagnosis] FRONTEND_URL Value: ${frontendUrl}`);
     }
 
-    if (!frontendUrl || frontendUrl.includes('localhost') || frontendUrl.includes('127.0.0.1')) {
-      if (nodeEnv === 'production') {
-        console.error('❌ CRITICAL CONFIG ERROR: FRONTEND_URL is missing or invalid in production!');
-        throw new Error('Server configuration error: FRONTEND_URL environment variable must be set to your live website URL in the deployment dashboard.');
-      } else {
-        if (!frontendUrl) {
-           console.error('❌ FRONTEND_URL is missing in .env! Cannot create checkout session.');
-           throw new Error('FRONTEND_URL environment variable is MISSING. Please add it to your local .env file.');
-        }
-      }
+    // Safety bypass for hardcoded fallback
+    if (!frontendUrl) {
+      throw new Error('FRONTEND_URL is missing.');
     }
 
     console.log(`[Stripe] Session Success URL: ${frontendUrl}/checkout/success...`);
