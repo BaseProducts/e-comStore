@@ -5,7 +5,7 @@ import { authenticateUser } from '../middleware/auth.middleware.js';
 const router = Router();
 
 // Verify Stripe session (frontend success page polls this)
-router.get('/verify-session', authenticateUser, verifySession);
+router.get('/verify-session', verifySession);
 
 // Order routes
 router.get('/', getAllOrders);

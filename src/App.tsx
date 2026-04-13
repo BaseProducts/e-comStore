@@ -40,9 +40,9 @@ const App = () => (
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route element={<UserProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/orders" element={<MyOrders />} />
             </Route>
             <Route path="*" element={<NotFound />} />

@@ -11,7 +11,6 @@ import Category from '../models/Category.js';
  */
 export const verifySession = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?.id;
     const { session_id } = req.query;
 
     if (!session_id) {
@@ -21,7 +20,6 @@ export const verifySession = async (req: Request, res: Response) => {
     const order = await Order.findOne({
       where: {
         stripeSessionId: session_id as string,
-        userId,
       },
       include: [{ model: OrderItem, as: 'items' }],
     });
