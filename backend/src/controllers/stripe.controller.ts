@@ -64,27 +64,31 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       return sum + price * item.quantity;
     }, 0);
 
-    let frontendUrl = process.env.FRONTEND_URL;
+    const frontendUrl = process.env.FRONTEND_URL;
     const nodeEnv = process.env.NODE_ENV;
+    
+    // Diagnostic logging for production debugging
+    console.log(`[Stripe Diagnosis] CWD: ${process.cwd()}`);
+    console.log(`[Stripe Diagnosis] NODE_ENV: ${nodeEnv || 'not set'}`);
+    console.log(`[Stripe Diagnosis] FRONTEND_URL: ${frontendUrl ? 'PRESENT' : 'MISSING'}`);
+    
+    if (frontendUrl) {
+      console.log(`[Stripe Diagnosis] FRONTEND_URL Value: ${frontendUrl}`);
+    }
 
-    console.log(`[Stripe Debug] process.env.FRONTEND_URL: ${frontendUrl || 'undefined'}`);
-    console.log(`[Stripe Debug] process.env.NODE_ENV: ${nodeEnv || 'undefined'}`);
-
-    // Production Safeguard: Never fall back to localhost in production
-    if (nodeEnv === 'production') {
-      if (!frontendUrl || frontendUrl.includes('localhost') || frontendUrl.includes('127.0.0.1')) {
-        console.error('❌ CRITICAL: FRONTEND_URL is missing or set to localhost in production environment!');
-        throw new Error('Server configuration error: FRONTEND_URL must be set to the deployed URL in production.');
-      }
-    } else {
-      // In development/test, we allow fallback if not provided
-      if (!frontendUrl) {
-        frontendUrl = 'http://localhost:5173';
-        console.log(`[Stripe Debug] Using development fallback URL: ${frontendUrl}`);
+    if (!frontendUrl || frontendUrl.includes('localhost') || frontendUrl.includes('127.0.0.1')) {
+      if (nodeEnv === 'production') {
+        console.error('❌ CRITICAL CONFIG ERROR: FRONTEND_URL is missing or invalid in production!');
+        throw new Error('Server configuration error: FRONTEND_URL environment variable must be set to your live website URL in the deployment dashboard.');
+      } else {
+        if (!frontendUrl) {
+           console.error('❌ FRONTEND_URL is missing in .env! Cannot create checkout session.');
+           throw new Error('FRONTEND_URL environment variable is MISSING. Please add it to your local .env file.');
+        }
       }
     }
 
-    console.log(`[Stripe] Checkout Session Target URL: ${frontendUrl}`);
+    console.log(`[Stripe] Session Success URL: ${frontendUrl}/checkout/success...`);
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({

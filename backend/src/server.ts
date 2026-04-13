@@ -25,17 +25,18 @@ connectDB();
 
 // Environment Validation
 const isProduction = process.env.NODE_ENV === 'production';
-console.log(`[Startup] Environment: ${process.env.NODE_ENV}`);
+console.log(`[Startup Diagnosis] ---------------------------------------`);
+console.log(`[Startup Diagnosis] CWD: ${process.cwd()}`);
+console.log(`[Startup Diagnosis] Environment: ${process.env.NODE_ENV || 'undefined'}`);
+console.log(`[Startup Diagnosis] PORT: ${process.env.PORT || 'using default 5000'}`);
+console.log(`[Startup Diagnosis] FRONTEND_URL: ${process.env.FRONTEND_URL ? 'PRESENT' : 'MISSING (ACTION REQUIRED)'}`);
+console.log(`[Startup Diagnosis] DATABASE_URL: ${process.env.DATABASE_URL ? 'PRESENT' : 'MISSING (ACTION REQUIRED)'}`);
+console.log(`[Startup Diagnosis] ---------------------------------------`);
 
 if (isProduction) {
   if (!process.env.FRONTEND_URL) {
-    console.warn('⚠️  [Warning] FRONTEND_URL is not set in production. Checkout redirects will fail.');
+    console.error('❌ CRITICAL ERROR: FRONTEND_URL is missing in production. Checkout WILL FAIL.');
   }
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    console.warn('⚠️  [Warning] STRIPE_WEBHOOK_SECRET is not set. Webhooks will fail signature verification.');
-  }
-} else {
-  console.log(`[Startup] Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173 (default)'}`);
 }
 
 const app = express();
