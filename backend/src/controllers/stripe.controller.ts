@@ -140,8 +140,11 @@ export const handleWebhook = async (req: Request, res: Response) => {
     }
 
     // req.body is raw Buffer here (thanks to express.raw middleware in server.ts)
+    console.log(`[Stripe Webhook] Request Body Type: ${typeof req.body}`);
+    console.log(`[Stripe Webhook] Request Body IsBuffer: ${Buffer.isBuffer(req.body)}`);
+    
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    console.log(`[Stripe Webhook] Event Type: ${event.type}`);
+    console.log(`[Stripe Webhook] ✅ Event Verified: ${event.id} [${event.type}]`);
   } catch (err: any) {
     console.error(`❌ Webhook signature verification failed: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);

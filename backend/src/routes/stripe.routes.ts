@@ -8,6 +8,7 @@ const router = Router();
 router.post('/create-session', authenticateUser, createCheckoutSession);
 
 // Stripe Webhook (raw body, no auth — Stripe sends this directly)
-router.post('/stripe', handleWebhook);
+// Full Path: /api/stripe/webhook
+router.post('/webhook', handleWebhook);
 
 export default router;

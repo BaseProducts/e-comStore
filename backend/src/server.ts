@@ -55,8 +55,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Specialized Raw Body Parser for Stripe Webhooks
-app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));
+// Stripe Webhook Sniffer & Raw Body Parser
+// This MUST come before any other express middleware for this specific path
+app.use('/api/stripe/webhook', (req, res, next) => {
+  if (req.method === 'POST') {
+    console.log(`[Webhook Sniffer] Incoming POST request to /api/stripe/webhook`);
+    console.log(`[Webhook Sniffer] Headers: ${JSON.stringify(req.headers['stripe-signature'] ? 'Has Sig' : 'No Sig')}`);
+  }
+  next();
+}, express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -72,8 +79,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/webhooks', stripeRoutes);
-app.use('/api/checkout', stripeRoutes);
+app.use('/api/stripe', stripeRoutes); // Standardized Webhook & Checkout prefix
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/contact', contactRoutes);
