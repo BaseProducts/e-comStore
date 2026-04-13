@@ -12,6 +12,13 @@ dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+// Webhook Secret Diagnostic
+if (endpointSecret) {
+  console.log(`[Diagnostic] STRIPE_WEBHOOK_SECRET is set. (Masked: ...${endpointSecret.slice(-4)})`);
+} else {
+  console.warn(`[Diagnostic] ❌ STRIPE_WEBHOOK_SECRET is MISSING in environment variables!`);
+}
+
 /**
  * Creates a Stripe Checkout Session.
  * - Validates user's cart from DB (uses real server-side prices, not client-sent)
