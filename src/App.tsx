@@ -13,6 +13,7 @@ import ContactUs from "./pages/ContactUs.tsx";
 import ProductDetails from "./pages/ProductDetails.tsx";
 import Auth from "./pages/Auth.tsx";
 import Checkout from "./pages/Checkout.tsx";
+import CheckoutSuccess from "./pages/CheckoutSuccess.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.tsx";
 import UserProtectedRoute from "./components/auth/UserProtectedRoute.tsx";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route element={<UserProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/orders" element={<MyOrders />} />
             </Route>
             <Route path="*" element={<NotFound />} />

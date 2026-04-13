@@ -8,8 +8,8 @@ import {
   ShieldCheck, 
   ArrowLeft, 
   Truck, 
-  CheckCircle2,
-  Lock
+  Lock,
+  Zap
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { toast } from "sonner";
@@ -18,11 +18,10 @@ import { BASE_URL, authHeaders } from "@/lib/utils";
 
 const Checkout = () => {
     const navigate = useNavigate();
-    const { cartItems, totalPrice, isLoading, clearCart } = useCart();
+    const { cartItems, totalPrice, isLoading } = useCart();
     const [isProcessing, setIsProcessing] = useState(false);
-    const [orderSuccess, setOrderSuccess] = useState(false);
 
-    // Form Stats
+    // Form State — shipping details only, payment is always Stripe
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -31,10 +30,7 @@ const Checkout = () => {
         state: "",
         zipCode: "",
         phone: "",
-        paymentMethod: "cod"
     });
-
-
 
     const subtotal = totalPrice;
     const grandTotal = subtotal;
@@ -63,29 +59,23 @@ const Checkout = () => {
         setIsProcessing(true);
         
         try {
-            const response = await fetch(`${BASE_URL}/api/orders`, {
+            // Create a Stripe Checkout Session on the backend
+            const response = await fetch(`${BASE_URL}/api/checkout/create-session`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     ...authHeaders()
                 },
-                body: JSON.stringify({
-                    ...formData,
-                    subtotal,
-                    tax: 0,
-                    shipping: 0,
-                    total: grandTotal
-                })
+                body: JSON.stringify(formData)
             });
 
             const result = await response.json();
 
-            if (response.ok) {
-                setOrderSuccess(true);
-                toast.success("Order placed successfully!");
-                clearCart();
+            if (response.ok && result.url) {
+                // Redirect to Stripe Checkout page
+                window.location.href = result.url;
             } else {
-                toast.error(result.message || "Failed to place order");
+                toast.error(result.message || "Failed to initiate payment");
             }
         } catch (error) {
             toast.error("Connection error. Please try again.");
@@ -94,30 +84,6 @@ const Checkout = () => {
             setIsProcessing(false);
         }
     };
-
-    if (orderSuccess) {
-        return (
-            <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
-                <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mb-6"
-                >
-                    <CheckCircle2 size={48} className="text-primary" />
-                </motion.div>
-                <h1 className="text-4xl font-black mb-4 uppercase tracking-tighter">Order Confirmed!</h1>
-                <p className="text-muted-foreground max-w-md mb-10">
-                    Thank you for your purchase. We've sent a confirmation email to {formData.email || "your address"}. Your order is being processed.
-                </p>
-                <Link 
-                    to="/"
-                    className="bg-primary text-primary-foreground px-8 py-4 rounded-sm font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95"
-                >
-                    Back to Home
-                </Link>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
@@ -138,7 +104,7 @@ const Checkout = () => {
                         <ChevronRight size={14} />
                         <span>02 Payment</span>
                         <ChevronRight size={14} />
-                        <span>03 Review</span>
+                        <span>03 Confirm</span>
                     </div>
                 </div>
 
@@ -237,6 +203,7 @@ const Checkout = () => {
                             </form>
                         </section>
 
+                        {/* Payment Method — Stripe Only badge */}
                         <section className="space-y-6">
                             <div className="flex items-center gap-3 mb-2">
                                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-black text-sm">2</div>
@@ -245,28 +212,33 @@ const Checkout = () => {
                                 </h2>
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {["cod"/*, "stripe"*/].map((method) => (
-                                    <button
-                                        key={method}
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method }))}
-                                        className={`p-6 rounded-sm border-2 transition-all text-left space-y-2 group ${
-                                            formData.paymentMethod === method 
-                                            ? "border-primary bg-primary/5" 
-                                            : "border-border bg-muted/20 hover:border-border/80"
-                                        }`}
-                                    >
-                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                            formData.paymentMethod === method ? "border-primary" : "border-muted-foreground"
-                                        }`}>
-                                            {formData.paymentMethod === method && <div className="w-2 h-2 rounded-full bg-primary" />}
+                            <div className="p-6 rounded-sm border-2 border-primary bg-primary/5 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                            <CreditCard size={20} className="text-white" />
                                         </div>
-                                        <p className="text-xs font-black uppercase tracking-widest">
-                                            {method === "cod" ? "Cash On Delivery" : "Stripe Checkout"}
-                                        </p>
-                                    </button>
-                                ))}
+                                        <div>
+                                            <p className="text-sm font-black uppercase tracking-wider">Stripe Secure Checkout</p>
+                                            <p className="text-[10px] text-muted-foreground font-bold tracking-wide">
+                                                Credit/Debit Cards • Apple Pay • Google Pay
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
+                                        <ShieldCheck size={14} className="text-emerald-500" />
+                                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Secured</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-widest text-muted-foreground pt-2 border-t border-border/50">
+                                    <div className="flex items-center gap-1">
+                                        <Lock size={10} /> End-to-End Encrypted
+                                    </div>
+                                    <span className="text-border">|</span>
+                                    <div className="flex items-center gap-1">
+                                        <Zap size={10} /> Instant Confirmation
+                                    </div>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -311,7 +283,7 @@ const Checkout = () => {
                                 form="checkout-form"
                                 type="submit"
                                 disabled={isProcessing || cartItems.length === 0}
-                                className="w-full py-5 bg-primary text-primary-foreground font-black uppercase tracking-[0.2em] rounded-sm hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 overflow-hidden relative group"
+                                className="w-full py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black uppercase tracking-[0.2em] rounded-sm hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 overflow-hidden relative group shadow-lg shadow-indigo-500/20"
                             >
                                 <AnimatePresence mode="wait">
                                     {isProcessing ? (
@@ -322,8 +294,8 @@ const Checkout = () => {
                                             exit={{ y: -20 }}
                                             className="flex items-center gap-2"
                                         >
-                                            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                                            Processing...
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Redirecting to Stripe...
                                         </motion.div>
                                     ) : (
                                         <motion.div 
@@ -333,8 +305,8 @@ const Checkout = () => {
                                             exit={{ y: -20 }}
                                             className="flex items-center gap-2"
                                         >
-                                            <ShieldCheck size={18} />
-                                            Proceed to Buy
+                                            <CreditCard size={18} />
+                                            Pay with Stripe
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -346,6 +318,9 @@ const Checkout = () => {
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <Truck size={10} /> Fast Delivery
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <ShieldCheck size={10} /> Stripe Protected
                                 </div>
                             </div>
                         </div>

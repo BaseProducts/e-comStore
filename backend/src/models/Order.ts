@@ -18,10 +18,16 @@ interface OrderAttributes {
   total: number;
   status: 'pending' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
   paymentMethod: string;
+  paymentStatus: 'pending' | 'paid' | 'failed';
+  stripeSessionId: string | null;
+  stripePaymentIntentId: string | null;
 }
 
-interface OrderCreationAttributes extends Omit<OrderAttributes, 'id' | 'status'> {
+interface OrderCreationAttributes extends Omit<OrderAttributes, 'id' | 'status' | 'paymentStatus' | 'stripeSessionId' | 'stripePaymentIntentId'> {
   status?: string;
+  paymentStatus?: string;
+  stripeSessionId?: string | null;
+  stripePaymentIntentId?: string | null;
 }
 
 class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
@@ -40,6 +46,9 @@ class Order extends Model<OrderAttributes, OrderCreationAttributes> implements O
   declare public total: number;
   declare public status: 'pending' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
   declare public paymentMethod: string;
+  declare public paymentStatus: 'pending' | 'paid' | 'failed';
+  declare public stripeSessionId: string | null;
+  declare public stripePaymentIntentId: string | null;
 
   declare public readonly createdAt: Date;
   declare public readonly updatedAt: Date;
@@ -107,6 +116,20 @@ Order.init(
     paymentMethod: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: 'stripe',
+    },
+    paymentStatus: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'pending',
+    },
+    stripeSessionId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    stripePaymentIntentId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {

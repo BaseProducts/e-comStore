@@ -20,6 +20,7 @@ interface Order {
     total: number;
     status: 'pending' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
     paymentMethod: string;
+    paymentStatus: string;
     createdAt: string;
     items: OrderItem[];
 }
@@ -132,7 +133,14 @@ const MyOrders = () => {
                                             </div>
                                             <div>
                                                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Payment</p>
-                                                <p className="text-[10px] font-bold uppercase">{order.paymentMethod}</p>
+                                                <div className="flex items-center gap-1.5">
+                                                    <p className="text-[10px] font-bold uppercase">Stripe</p>
+                                                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full ${
+                                                        order.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'
+                                                    }`}>
+                                                        {order.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 bg-background border border-border px-3 py-1.5 rounded-full">

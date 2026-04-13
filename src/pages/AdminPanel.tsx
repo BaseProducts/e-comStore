@@ -87,6 +87,7 @@ interface Order {
     status: string;
     createdAt: string;
     paymentMethod: string;
+    paymentStatus: string;
     items: OrderItem[];
 }
 
@@ -699,7 +700,7 @@ const AdminPanel = () => {
                                             ${stats.totalEarnings.toLocaleString()}
                                         </div>
                                         <p className="text-[9px] text-muted-foreground mt-1 uppercase font-bold tracking-widest">
-                                            <span className="text-emerald-500 inline-flex items-center gap-0.5">Live <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span></span> • Verified Delivery
+                                            <span className="text-emerald-500 inline-flex items-center gap-0.5">Live <span className="w-1 h-1 rounded-full bg-emerald-500 animate-ping"></span></span> • Stripe Verified
                                         </p>
                                     </CardContent>
                                 </Card>
@@ -1298,11 +1299,20 @@ const AdminPanel = () => {
                                                                 <div className="font-black font-mono text-primary text-base">${order.total.toFixed(0)}</div>
                                                             </td>
                                                             <td className="p-4 align-top">
-                                                                <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border ${
-                                                                    order.paymentMethod === 'cod' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-indigo-50 text-indigo-600 border-indigo-200'
-                                                                }`}>
-                                                                    {order.paymentMethod === 'cod' ? 'Cash On Delivery' : 'Stripe'}
+                                                                <div className="flex flex-col gap-1.5">
+                                                                <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border bg-indigo-50 text-indigo-600 border-indigo-200">
+                                                                    Stripe
                                                                 </span>
+                                                                <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${
+                                                                    order.paymentStatus === 'paid' 
+                                                                        ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
+                                                                        : order.paymentStatus === 'failed'
+                                                                            ? 'bg-red-50 text-red-600 border-red-200'
+                                                                            : 'bg-amber-50 text-amber-600 border-amber-200'
+                                                                }`}>
+                                                                    {order.paymentStatus === 'paid' ? '● Paid' : order.paymentStatus === 'failed' ? '● Failed' : '● Pending'}
+                                                                </span>
+                                                            </div>
                                                             </td>
                                                             <td className="p-4 align-top">
                                                                 <select 

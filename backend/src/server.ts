@@ -57,6 +57,7 @@ app.get('/health', (req: Request, res: Response) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/webhooks', stripeRoutes);
+app.use('/api/checkout', stripeRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/contact', contactRoutes);
