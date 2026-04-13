@@ -60,7 +60,10 @@ export const connectDB = async () => {
           "shipping" FLOAT NOT NULL,
           "total" FLOAT NOT NULL,
           "status" VARCHAR(20) NOT NULL DEFAULT 'pending',
-          "paymentMethod" VARCHAR(50) NOT NULL,
+          "paymentMethod" VARCHAR(50) NOT NULL DEFAULT 'stripe',
+          "paymentStatus" VARCHAR(20) NOT NULL DEFAULT 'pending',
+          "stripeSessionId" VARCHAR(255),
+          "stripePaymentIntentId" VARCHAR(255),
           "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );

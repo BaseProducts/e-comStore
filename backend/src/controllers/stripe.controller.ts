@@ -64,7 +64,20 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       return sum + price * item.quantity;
     }, 0);
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+    let frontendUrl = process.env.FRONTEND_URL;
+
+    // Production Safeguard: Never fall back to localhost in production
+    if (process.env.NODE_ENV === 'production') {
+      if (!frontendUrl || frontendUrl.includes('localhost') || frontendUrl.includes('127.0.0.1')) {
+        console.error('❌ CRITICAL: FRONTEND_URL is missing or set to localhost in production environment!');
+        throw new Error('Server configuration error: FRONTEND_URL must be set to the deployed URL in production.');
+      }
+    } else {
+      // Development fallback
+      frontendUrl = frontendUrl || 'http://localhost:5173';
+    }
+
+    console.log(`[Stripe] Creating checkout session. Redirecting to: ${frontendUrl}`);
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -126,7 +139,14 @@ export const handleWebhook = async (req: Request, res: Response) => {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log(`✅ Payment successful for session: ${session.id}`);
+      console.log(`✅ [Stripe Webhook] Received checkout.session.completed: ${session.id}`);
+
+      // Log metadata presence
+      if (!session.metadata) {
+        console.error('❌ [Stripe Webhook] No metadata found in session');
+        break;
+      }
+      console.log(`[Stripe Webhook] Metadata summary: userId=${session.metadata.userId}, email=${session.metadata.email}`);
 
       // Prevent duplicate order creation (idempotency)
       const existingOrder = await Order.findOne({ where: { stripeSessionId: session.id } });
@@ -209,10 +229,11 @@ export const handleWebhook = async (req: Request, res: Response) => {
         await CartItem.destroy({ where: { userId }, transaction: t });
 
         await t.commit();
-        console.log(`✅ Order ${orderId} created for session ${session.id}`);
+        console.log(`✅ [Stripe Webhook] Order ${orderId} successfully created for session ${session.id}`);
       } catch (dbError: any) {
-        await t.rollback();
-        console.error('❌ Failed to create order from webhook:', dbError.message);
+        if (t) await t.rollback();
+        console.error('❌ [Stripe Webhook] Database error during order creation:', dbError.message);
+        console.error(dbError.stack);
       }
       break;
     }

@@ -23,6 +23,21 @@ import './models/OrderItem.js';
 // Connect to Database
 connectDB();
 
+// Environment Validation
+const isProduction = process.env.NODE_ENV === 'production';
+console.log(`[Startup] Environment: ${process.env.NODE_ENV}`);
+
+if (isProduction) {
+  if (!process.env.FRONTEND_URL) {
+    console.warn('⚠️  [Warning] FRONTEND_URL is not set in production. Checkout redirects will fail.');
+  }
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.warn('⚠️  [Warning] STRIPE_WEBHOOK_SECRET is not set. Webhooks will fail signature verification.');
+  }
+} else {
+  console.log(`[Startup] Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173 (default)'}`);
+}
+
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
