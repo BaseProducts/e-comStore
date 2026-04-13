@@ -26,7 +26,9 @@ export const verifySession = async (req: Request, res: Response) => {
 
     if (!order) {
       // Order might not be created yet (webhook still processing)
-      return res.status(404).json({ status: 'pending', message: 'Order not yet confirmed' });
+      // We return 200 with status='pending' instead of 404 to avoid noisy console errors in production
+      console.log(`[Verification] Session ${session_id} still pending (order not in DB yet)`);
+      return res.status(200).json({ status: 'pending', message: 'Order not yet confirmed' });
     }
 
     res.status(200).json({

@@ -54,27 +54,31 @@ const CheckoutSuccess = () => {
           }
         );
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.status === "success" && data.order) {
-            setOrder(data.order);
-            setStatus("success");
+        const data = await res.json();
+        
+        if (res.ok && data.status === "success" && data.order) {
+          setOrder(data.order);
+          setStatus("success");
 
-            // Clear cart state in frontend (backend already cleared it via webhook)
-            if (!hasCleared.current) {
-              clearCart();
-              hasCleared.current = true;
-            }
-            return; // Stop polling
+          // Clear cart state in frontend (backend already cleared it via webhook)
+          if (!hasCleared.current) {
+            clearCart();
+            hasCleared.current = true;
           }
+          return; // Stop polling successfully
         }
 
-        // Order not found yet — keep polling
+        // If explicitly pending or any other 200 response without order
+        if (data.status === "pending") {
+          console.log(`[Polling] Order still pending (Attempt ${attemptsRef.current + 1}/${maxAttempts})`);
+        }
+
+        // Keep polling
         attemptsRef.current += 1;
         if (attemptsRef.current >= maxAttempts) {
           setStatus("timeout");
         } else {
-          setTimeout(pollForOrder, 2000);
+          setTimeout(pollForOrder, 3000); // 3 second delay between polls
         }
       } catch {
         attemptsRef.current += 1;
