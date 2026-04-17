@@ -1,4 +1,4 @@
-import { Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPin, Phone } from "lucide-react";
 
 const FooterSection = () => {
   return (
@@ -36,15 +36,26 @@ const FooterSection = () => {
             <h4 className="text-xs tracking-[0.3em] uppercase text-muted-foreground mb-4">
               Follow
             </h4>
-            <a
-              href="https://www.instagram.com/baseproducts/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-secondary-foreground hover:text-primary transition-colors"
-            >
-              <Instagram size={16} />
-              @baseproducts
-            </a>
+            <div className="flex flex-col gap-3">
+              <a
+                href="https://www.instagram.com/baseproducts/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-secondary-foreground hover:text-primary transition-colors w-fit"
+              >
+                <Instagram size={16} />
+                @baseproducts
+              </a>
+              <a
+                href="https://www.facebook.com/people/Base-Produts/61577439501019/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-secondary-foreground hover:text-primary transition-colors w-fit"
+              >
+                <Facebook size={16} />
+                Base Products
+              </a>
+            </div>
           </div>
         </div>
 
