@@ -19,8 +19,8 @@ const FooterSection = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-secondary-foreground">
                 <Phone size={14} className="text-muted-foreground" />
-                (424) 206-3358
-              </li>
+                +1(424)-206-3358
+              </li> 
               <li className="flex items-center gap-3 text-sm text-secondary-foreground">
                 <Mail size={14} className="text-muted-foreground" />
                 basecustomer2018@gmail.com

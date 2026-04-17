@@ -121,7 +121,7 @@ const ContactUs = () => {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Phone</p>
-                                            <a href="tel:+14242063358" className="hover:text-primary transition-colors">(424) 206-3358</a>
+                                            <a href="tel:+14242063358" className="hover:text-primary transition-colors">+1(424)-206-3358</a>
                                         </div>
                                     </div>
                                     <div className="flex items-start gap-4">
