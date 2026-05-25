@@ -52,7 +52,11 @@ export const signup = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('Signup Error:', error);
-    res.status(500).json({ message: error.message });
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      const messages = error.errors.map((e: any) => e.message).join(', ');
+      return res.status(400).json({ message: messages });
+    }
+    res.status(500).json({ message: error.message || 'Internal Server Error' });
   }
 };
 
@@ -96,6 +100,10 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('Login Error:', error);
-    res.status(500).json({ message: error.message });
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      const messages = error.errors.map((e: any) => e.message).join(', ');
+      return res.status(400).json({ message: messages });
+    }
+    res.status(500).json({ message: error.message || 'Internal Server Error' });
   }
 };

@@ -1,73 +1,86 @@
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import heroBg from "@/assets/hero-bg.jpg";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import bannerImage from "@/assets/banner1.png";
+import bannerImage2 from "@/assets/banner2.png";
+import bannerImage3 from "@/assets/banner3.png";
+const slides = [
+  { image: bannerImage },
+  { image: bannerImage2 },
+  { image: bannerImage3 },
+];
 
 const HeroSection = () => {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handlePrev = () => {
+    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const handleNext = () => {
+    setCurrent((prev) => (prev + 1) % slides.length);
+  };
+
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative w-full aspect-[1923/817] overflow-hidden bg-muted/20">
+      {/* Slideshow */}
       <div className="absolute inset-0">
-        <img
-          src={heroBg}
-          alt="Base apparel campaign"
-          className="w-full h-full object-cover"
-          width={1920}
-          height={1080}
-        />
-        <div className="absolute inset-0 bg-background/70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-      </div>
-
-      <div className="relative z-10 text-center px-6 max-w-4xl">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-sm md:text-base tracking-[0.3em] uppercase text-muted-foreground mb-6"
-        >
-          Christian Streetwear
-        </motion.p>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tight leading-none mb-6"
-        >
-          Wear Your{" "}
-          <span className="gradient-text">Faith.</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto mb-10"
-        >
-          Christian apparel that speaks before you do.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1 }}
-        >
-          <Link
-            to="/shop"
-            className="inline-block gradient-btn px-10 py-4 rounded-sm text-sm tracking-[0.2em] uppercase"
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0 w-full h-full"
           >
-            Shop Now
-          </Link>
-        </motion.div>
+            <img
+              src={slides[current].image}
+              alt={`Banner ${current + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
+      {/* Side Controls */}
+      <button
+        onClick={handlePrev}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/70 hover:bg-white text-foreground shadow-md hover:scale-105 active:scale-95 transition-all border border-border"
+        aria-label="Previous slide"
       >
-        <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-muted-foreground to-transparent animate-pulse" />
-      </motion.div> */}
+        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
+      <button
+        onClick={handleNext}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/70 hover:bg-white text-foreground shadow-md hover:scale-105 active:scale-95 transition-all border border-border"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
+
+      {/* Centered Indicators */}
+      <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrent(index)}
+            className={`h-2 md:h-2.5 rounded-full transition-all duration-300 ${
+              index === current 
+                ? "w-6 md:w-8 bg-primary shadow-sm" 
+                : "w-2 md:w-2.5 bg-white/50 hover:bg-white/80"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
     </section>
   );
 };

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin-panel
+Disallow: /checkout
+Disallow: /orders
+
+Sitemap: https://baseproducts.online/sitemap.xml

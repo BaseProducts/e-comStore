@@ -599,7 +599,7 @@ const AdminPanel = () => {
 
 
     return (
-        <div className="flex min-h-screen bg-muted/30 font-mono">
+        <div className="flex min-h-screen bg-zinc-50 text-foreground font-sans">
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
                 <div 

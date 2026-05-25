@@ -18,6 +18,9 @@ import MyOrders from "./pages/MyOrders.tsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.tsx";
 import UserProtectedRoute from "./components/auth/UserProtectedRoute.tsx";
 import { CartProvider } from "./context/CartContext.tsx";
+import ShippingReturns from "./pages/ShippingReturns.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
+import TermsOfService from "./pages/TermsOfService.tsx";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +43,9 @@ const App = () => (
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/shipping-returns" element={<ShippingReturns />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route element={<UserProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />

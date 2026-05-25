@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
+import FooterSection from "../components/FooterSection";
 import { useCart } from "../context/CartContext";
 import { BASE_URL } from "@/lib/utils";
+import banner1 from "@/assets/banner1.png";
 
 type AuthMode = "login" | "signup";
 
@@ -72,8 +74,13 @@ const Auth = () => {
         <div className="min-h-screen bg-background font-mono selection:bg-primary/30 flex flex-col">
             <Navbar />
 
-            <div className="flex-1 flex items-center justify-center pt-24 pb-12 px-6">
-                <div className="w-full max-w-md relative">
+            <div className="flex-1 flex items-center justify-center pt-10 pb-12 px-6 relative overflow-hidden">
+                {/* Background Image Overlay with Low Opacity */}
+                <div 
+                    className="absolute inset-0 z-0 pointer-events-none opacity-[0.3] bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: `url(${banner1})` }}
+                />
+                <div className="w-full max-w-md relative z-10">
                     {/* Background Decorative Frame */}
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-background to-primary/20 rounded-lg blur opacity-50"></div>
                     
@@ -189,6 +196,7 @@ const Auth = () => {
                     </div>
                 </div>
             </div>
+            <FooterSection />
         </div>
     );
 };

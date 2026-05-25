@@ -1,15 +1,37 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, Menu, X, User, Trash2, Plus, Minus } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { 
+  ShoppingBag, Menu, X, User, Trash2, Plus, Minus,
+  Search, MessageCircle, Mail, Phone, Clock
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
+import whatsappIcon from "@/assets/WhatsApp_icon.png.webp";
+import logoImg from "@/assets/logo.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [searchVal, setSearchVal] = useState("");
   const { cartItems, totalItems, totalPrice, updateQuantity, removeFromCart, isLoading, clearCart } = useCart();
+  const [user, setUser] = useState<{ fullName?: string } | null>(null);
+  
+  const [serviceOpen, setServiceOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -17,116 +39,314 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".service-trigger-wrap")) {
+        setServiceOpen(false);
+      }
+      if (!target.closest(".user-trigger-wrap")) {
+        setUserOpen(false);
+      }
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchVal.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchVal.trim())}`);
+      setMobileOpen(false);
+    }
+  };
+
   const links = ["Home", "Shop", "About", "Contact"];
+
+  const getLinkPath = (link: string) => {
+    if (link === "Home") return "/";
+    if (link === "Shop") return "/shop";
+    if (link === "About") return "/about";
+    if (link === "Contact") return "/contact";
+    return `/#${link.toLowerCase()}`;
+  };
+
+  const isLinkActive = (link: string) => {
+    const path = getLinkPath(link);
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    if (path === "/shop") {
+      return location.pathname.startsWith("/shop") || location.pathname.startsWith("/product");
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-            ? "bg-background/90 backdrop-blur-md border-b border-border"
-            : "bg-transparent"
-          }`}
+        className="relative w-full z-50 shadow-sm border-b border-zinc-100 bg-white animate-fade-in"
       >
-        <div className="container mx-auto flex items-center justify-between h-16 md:h-20 px-6">
-          <Link to="/" className="flex items-center">
-            <img src="/logo.png" alt="Base Logo" className="h-8 md:h-10 object-contain" />
-          </Link>
-
-          <div className="hidden md:flex items-center gap-10">
-            {links.map((link) => (
-              <Link
-                key={link}
-                to={link === "Home" ? "/" : link === "Shop" ? "/shop" : link === "About" ? "/about" : link === "Contact" ? "/contact" : `/#${link.toLowerCase()}`}
-                className="text-sm font-medium tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
-              >
-                {link}
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="relative group flex items-center">
-              {localStorage.getItem("token") ? (
-                <>
-                  <button className="p-2 text-foreground hover:text-primary transition-colors cursor-default">
-                    <User size={20} />
-                  </button>
-                    <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                      <div className="w-40 rounded-md bg-background border border-border shadow-lg py-1 flex flex-col font-mono text-[10px] font-bold uppercase tracking-widest">
-                        <Link to="/orders" className="px-4 py-2 text-foreground hover:bg-muted transition-colors">Orders</Link>
-                        {/* <a href="#" className="px-4 py-2 text-foreground hover:bg-muted transition-colors opacity-50 cursor-not-allowed">Your Profile</a> */}
-                        <div className="border-t border-border my-1"></div>
-                      <button 
-                        onClick={() => {
-                          localStorage.removeItem("token");
-                          localStorage.removeItem("user");
-                          clearCart();
-                          window.location.href = "/auth";
-                        }}
-                        className="w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-muted transition-colors whitespace-nowrap"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <button className="p-2 text-foreground hover:text-primary transition-colors cursor-default">
-                    <User size={20} />
-                  </button>
-                  <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                    <div className="w-32 rounded-md bg-background border border-border shadow-lg py-1 flex flex-col">
-                      <Link to="/auth" className="px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">Login</Link>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <button 
-              onClick={() => setCartOpen(true)}
-              className="relative p-2 text-foreground hover:text-primary transition-colors"
-            >
-              <ShoppingBag size={20} />
-              {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full gradient-btn text-[10px] flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </button>
-            <button
-              className="md:hidden p-2 text-foreground"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-            </button>
-          </div>
+        {/* Announcement Bar */}
+        <div className="bg-black text-white text-[6.5px] min-[320px]:text-[7px] min-[360px]:text-[8.5px] sm:text-[9.5px] md:text-[11px] font-bold uppercase tracking-normal min-[360px]:tracking-wide sm:tracking-[0.25em] py-2 px-2 sm:px-4 text-center border-b border-zinc-900 flex items-center justify-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
+          <span className="truncate">⚡ Fashion That Evangelizes! Minimal Design. Maximum Message. ⚡</span>
         </div>
 
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-background/95 backdrop-blur-md border-b border-border overflow-hidden"
-            >
-              <div className="flex flex-col items-center gap-6 py-8">
-                {links.map((link) => (
-                  <Link
-                    key={link}
-                    to={link === "Home" ? "/" : link === "Shop" ? "/shop" : link === "About" ? "/about" : link === "Contact" ? "/contact" : `/#${link.toLowerCase()}`}
-                    onClick={() => setMobileOpen(false)}
-                    className="text-sm font-medium tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link}
-                  </Link>
-                ))}
+        {/* Main Navbar Row */}
+        <div className="bg-white">
+          <div className="container mx-auto flex items-center justify-between h-20 px-6">
+            <Link to="/" className="flex items-center shrink-0">
+              <img src={logoImg} alt="Base Logo" className="h-10 md:h-12 object-contain" />
+            </Link>
+
+            {/* Nav Links Beside Search (Desktop) */}
+            <div className="hidden lg:flex items-center gap-8 ml-8">
+              {links.map((link) => (
+                <Link
+                  key={link}
+                  to={getLinkPath(link)}
+                  className={`text-xs font-bold tracking-[0.15em] uppercase transition-colors relative py-2 group ${
+                    isLinkActive(link) ? "text-zinc-950" : "text-zinc-400 hover:text-zinc-950"
+                  }`}
+                >
+                  {link}
+                  <span className={`absolute bottom-0 left-0 h-0.5 bg-zinc-950 transition-all duration-300 ${
+                    isLinkActive(link) ? "w-full" : "w-0 group-hover:w-full"
+                  }`} />
+                </Link>
+              ))}
+            </div>
+ 
+            {/* Search Bar - Center (Desktop) */}
+            <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center flex-1 max-w-xs lg:max-w-sm mx-6 relative">
+              <div className="w-full relative group">
+                <input
+                  type="text"
+                  placeholder="Search our faith collection..."
+                  value={searchVal}
+                  onChange={(e) => setSearchVal(e.target.value)}
+                  className="w-full bg-zinc-50 hover:bg-zinc-100/70 focus:bg-white text-zinc-900 placeholder:text-zinc-400 text-xs px-5 py-2.5 pl-11 pr-4 rounded-full border border-zinc-200 focus:border-zinc-800 focus:ring-1 focus:ring-zinc-800 transition-all duration-300 shadow-sm"
+                />
+                <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-800 transition-colors" />
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </form>
+
+            <div className="flex items-center gap-2 md:gap-4">
+              {/* Central Service dropdown */}
+              <div className="relative service-trigger-wrap flex items-center">
+                <div 
+                  onClick={() => {
+                    setServiceOpen(!serviceOpen);
+                    setUserOpen(false);
+                  }}
+                  className="flex items-center gap-2 text-zinc-700 hover:text-black transition-colors cursor-pointer py-2 select-none"
+                >
+                  <MessageCircle size={20} className="shrink-0" />
+                  <div className="hidden md:flex flex-col text-left leading-none">
+                    <span className="text-[10px] text-zinc-400 font-medium leading-none">Central</span>
+                    <span className="text-xs font-bold leading-tight text-zinc-800 mt-0.5">Service</span>
+                  </div>
+                </div>
+                
+                {/* Central Service dropdown tooltip */}
+                <div className={`fixed top-20 left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:w-72 pt-2 transition-all duration-200 z-50 ${serviceOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
+                  <div className="w-full sm:w-72 bg-white rounded-md border border-zinc-100 shadow-xl p-4 text-zinc-800 font-sans">
+                    <a 
+                      href="https://wa.me/14242063358" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center gap-3 py-2.5 border-b border-zinc-100 hover:bg-zinc-50 transition-colors px-2 rounded-sm"
+                    >
+                      <img src={whatsappIcon} alt="WhatsApp" className="w-5 h-5 shrink-0 object-contain" />
+                      <div className="text-left">
+                        <div className="text-[9px] text-zinc-400 font-bold uppercase leading-none">WhatsApp:</div>
+                        <div className="text-xs font-bold text-zinc-800">+1(424)-206-3358</div>
+                      </div>
+                    </a>
+                    
+                    <a 
+                      href="tel:+14242063358" 
+                      className="flex items-center gap-3 py-2.5 border-b border-zinc-100 hover:bg-zinc-50 transition-colors px-2 rounded-sm"
+                    >
+                      <Phone size={14} className="text-zinc-500" />
+                      <div className="text-left">
+                        <div className="text-[9px] text-zinc-400 font-bold uppercase leading-none">Telephone:</div>
+                        <div className="text-xs font-bold text-zinc-800">+1(424)-206-3358</div>
+                      </div>
+                    </a>
+
+                    <a 
+                      href="mailto:basecustomer2018@gmail.com" 
+                      className="flex items-center gap-3 py-2.5 border-b border-zinc-100 hover:bg-zinc-50 transition-colors px-2 rounded-sm"
+                    >
+                      <Mail size={14} className="text-zinc-500" />
+                      <div className="text-left">
+                        <div className="text-[9px] text-zinc-400 font-bold uppercase leading-none">E-mail:</div>
+                        <div className="text-xs font-bold text-zinc-800">basecustomer2018@gmail.com</div>
+                      </div>
+                    </a>
+
+                    <div className="flex items-center gap-3 py-2.5 border-b border-zinc-100 px-2">
+                      <Clock size={14} className="text-zinc-400" />
+                      <div className="text-left">
+                        <div className="text-[9px] text-zinc-400 font-bold uppercase leading-none">Opening Hours:</div>
+                        <div className="text-[11px] font-semibold text-zinc-600">Mon. to Fri. - 9:00 am to 5:00 pm</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <Link 
+                        to="/contact" 
+                        className="block w-full text-center bg-black hover:bg-zinc-900 text-white font-bold uppercase tracking-widest text-[9px] py-2.5 rounded-sm transition-colors"
+                      >
+                        Contact Us
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative user-trigger-wrap flex items-center">
+                {user ? (
+                  <>
+                    <div 
+                      onClick={() => {
+                        setUserOpen(!userOpen);
+                        setServiceOpen(false);
+                      }}
+                      className="flex items-center gap-2 text-zinc-700 hover:text-black transition-colors cursor-pointer py-2 select-none"
+                    >
+                      <User size={20} className="shrink-0" />
+                      <div className="hidden md:flex flex-col text-left leading-none">
+                        <span className="text-[10px] text-zinc-400 font-medium leading-none">Welcome,</span>
+                        <span className="text-xs font-bold leading-tight text-zinc-800 mt-0.5 max-w-[100px] truncate">{user.fullName}</span>
+                      </div>
+                    </div>
+                    <div className={`absolute right-0 top-full pt-2 transition-all duration-200 z-50 origin-top-right ${userOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
+                      <div className="w-40 rounded-md bg-white border border-zinc-100 shadow-lg py-1 flex flex-col font-sans text-xs tracking-wider">
+                        <Link to="/orders" className="px-4 py-2 text-zinc-700 hover:bg-zinc-50 transition-colors font-semibold">Orders</Link>
+                        <div className="border-t border-zinc-100 my-1"></div>
+                        <button 
+                          onClick={() => {
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("user");
+                            clearCart();
+                            setUser(null);
+                            window.location.href = "/auth";
+                          }}
+                          className="w-full px-4 py-2 text-xs text-left text-red-500 hover:bg-zinc-50 transition-colors whitespace-nowrap font-semibold"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" className="flex items-center gap-2 text-zinc-700 hover:text-black transition-colors cursor-pointer py-2">
+                      <User size={20} className="shrink-0" />
+                      <div className="hidden md:flex flex-col text-left leading-none">
+                        <span className="text-[10px] text-zinc-400 font-medium leading-none">Hello, Welcome!</span>
+                        <span className="text-xs font-bold leading-tight text-zinc-800 mt-0.5">Log in or Register</span>
+                      </div>
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              <button 
+                onClick={() => setCartOpen(true)}
+                className="flex items-center gap-2 text-zinc-700 hover:text-black transition-colors py-2 relative"
+              >
+                <div className="relative">
+                  <ShoppingBag size={20} className="shrink-0" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-black text-white text-[9px] font-black flex items-center justify-center shadow-sm">
+                      {totalItems}
+                    </span>
+                  )}
+                </div>
+                <div className="hidden md:flex flex-col text-left leading-none">
+                  <span className="text-xs font-bold text-zinc-800 leading-tight">My Bag</span>
+                  <span className="text-[10px] text-zinc-400 font-medium mt-0.5">${totalPrice.toFixed(2)}</span>
+                </div>
+              </button>
+              <button
+                className="md:hidden p-2 text-zinc-700 hover:text-black transition-colors"
+                onClick={() => setMobileOpen(!mobileOpen)}
+              >
+                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+          </div>
+ 
+          {/* Mobile Navigation Drawer */}
+          <AnimatePresence>
+            {mobileOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setMobileOpen(false)}
+                  className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm md:hidden"
+                />
+                {/* Drawer */}
+                <motion.div
+                  initial={{ x: "100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                  className="fixed right-0 top-0 bottom-0 w-full max-w-[300px] bg-white z-[70] shadow-2xl border-l border-zinc-200 flex flex-col md:hidden"
+                >
+                  {/* Header with Close Cross Button */}
+                  <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
+                    <span className="text-zinc-950 font-black uppercase tracking-widest text-sm">Navigation</span>
+                    <button 
+                      onClick={() => setMobileOpen(false)}
+                      className="p-2 hover:bg-zinc-100 rounded-full transition-colors text-zinc-800"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  {/* Body links */}
+                  <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6 font-sans">
+                    {links.map((link) => (
+                      <Link
+                        key={link}
+                        to={getLinkPath(link)}
+                        onClick={() => setMobileOpen(false)}
+                        className={`text-base tracking-widest uppercase transition-colors border-b pb-3 ${
+                          isLinkActive(link) 
+                            ? "text-orange-600 border-orange-600 font-black" 
+                            : "text-zinc-500 hover:text-zinc-950 border-zinc-100 font-bold"
+                        }`}
+                      >
+                        {link}
+                      </Link>
+                    ))}
+
+                    {/* Mobile Search Bar */}
+                    <form onSubmit={handleSearchSubmit} className="relative mt-4">
+                      <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchVal}
+                        onChange={(e) => setSearchVal(e.target.value)}
+                        className="w-full bg-zinc-50 text-zinc-900 placeholder:text-zinc-400 text-xs px-4 py-3 pr-10 rounded-xl border border-zinc-200 focus:outline-none focus:border-orange-500"
+                      />
+                      <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-550">
+                        <Search size={15} />
+                      </button>
+                    </form>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
       </nav>
 
       {/* Cart Drawer */}
@@ -262,6 +482,17 @@ const Navbar = () => {
           </>
         )}
       </AnimatePresence>
+
+      {/* Floating WhatsApp Button */}
+      <a
+        href="https://wa.me/14242063358"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 duration-300 drop-shadow-xl"
+        aria-label="Contact on WhatsApp"
+      >
+        <img src={whatsappIcon} alt="WhatsApp" className="w-14 h-14 object-contain" />
+      </a>
     </>
   );
 };

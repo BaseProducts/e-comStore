@@ -3,45 +3,34 @@ import { motion } from "framer-motion";
 import { ShoppingBag, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "@/lib/utils";
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  discountPrice?: number;
-  category: string;
-  gender: string;
-  imageUrls: string[];
-  isVisible: boolean;
-  stock: number;
-}
+import { Product } from "./FeaturedProducts";
 
 const PRODUCTS_API = `${BASE_URL}/api/products`;
 
-const FeaturedProducts = () => {
+const TopwearSection = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchLatestProducts = async () => {
+    const fetchTopwearProducts = async () => {
       try {
         const response = await fetch(PRODUCTS_API);
         if (response.ok) {
           const data = await response.json();
-          // Filter to visible only, and get the most recent 8
-          // The API retrieves by createdAt DESC so we just take first 8 visible
-          const filtered = data.filter((p: Product) => p.isVisible);
-          setProducts(filtered.slice(0, 8));
+          // Filter to visible, and category matches Topwear (case insensitive)
+          const filtered = data.filter(
+            (p: Product) => p.isVisible && p.category?.toLowerCase() === "topwear"
+          );
+          setProducts(filtered.slice(0, 4));
         }
       } catch (error) {
-        console.error("Error fetching featured products", error);
+        console.error("Error fetching topwear products", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchLatestProducts();
+    fetchTopwearProducts();
   }, []);
 
   useEffect(() => {
@@ -62,8 +51,12 @@ const FeaturedProducts = () => {
     }
   };
 
+  if (!isLoading && products.length === 0) {
+    return null; // Don't render anything if no topwears are found
+  }
+
   return (
-    <section id="shop" className="py-12 md:py-20 px-4 md:px-6">
+    <section className="py-12 md:py-20 px-4 md:px-6">
       <div className="container mx-auto bg-zinc-200/90 border border-zinc-200/50 rounded-2xl p-8 md:p-12 lg:p-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -73,21 +66,16 @@ const FeaturedProducts = () => {
           className="text-center mb-16"
         >
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-3">
-            New Arrivals
+            Premium Selection
           </p>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight">
-            Featured
+            Topwear Collection
           </h2>
         </motion.div>
 
         {isLoading ? (
           <div className="flex justify-center p-20 opacity-50">
             <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center text-muted-foreground uppercase tracking-widest text-sm flex flex-col items-center">
-            <Package className="w-10 h-10 mb-4 opacity-50" />
-            <p>No products featured yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
@@ -161,10 +149,10 @@ const FeaturedProducts = () => {
             ))}
           </div>
         )}
-        
+
         {!isLoading && products.length > 0 && (
           <div className="text-center mt-12">
-            <Link to="/shop" className="inline-block bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white hover:border-orange-600 px-8 py-3 rounded-md text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm">
+            <Link to="/shop?search=Topwear" className="inline-block bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white hover:border-orange-600 px-8 py-3 rounded-md text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm">
                View All Products
             </Link>
           </div>
@@ -174,4 +162,4 @@ const FeaturedProducts = () => {
   );
 };
 
-export default FeaturedProducts;
+export default TopwearSection;

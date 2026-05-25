@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingBag, ChevronRight, Package, ArrowLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
+import FooterSection from "../components/FooterSection";
+import SEO from "../components/SEO";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 import { BASE_URL } from "@/lib/utils";
@@ -103,7 +105,7 @@ const ProductDetails = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-background font-mono flex flex-col">
+            <div className="min-h-screen bg-background font-sans flex flex-col">
                 <Navbar />
                 <div className="flex-1 flex justify-center items-center opacity-50">
                     <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
@@ -114,7 +116,7 @@ const ProductDetails = () => {
 
     if (!product) {
         return (
-            <div className="min-h-screen bg-background font-mono flex flex-col">
+            <div className="min-h-screen bg-background font-sans flex flex-col">
                 <Navbar />
                 <div className="flex-1 flex flex-col justify-center items-center">
                     <Package className="w-16 h-16 opacity-30 mb-4" />
@@ -130,117 +132,129 @@ const ProductDetails = () => {
     const availableImages = product.imageUrls || [];
 
     return (
-        <div className="min-h-screen bg-background font-mono selection:bg-primary/30">
+        <div className="min-h-screen bg-background font-sans selection:bg-primary/30">
+            <SEO 
+                title={`${product.name} | ${product.category}`}
+                description={`${product.description} Shop this high-fidelity ${product.category} at Base Products (baseproducts.online) - priced at $${product.discountPrice || product.price}.`}
+                keywords={`${product.name}, ${product.category}, baseproducts clothing, base products ${product.category}, faith garments`}
+                canonicalUrl={`https://baseproducts.online/product/${product.id}`}
+                ogImage={product.imageUrls?.[0] || "https://baseproducts.online/logo.png"}
+                ogType="product"
+            />
             <Navbar />
 
             {/* Breadcrumb Navigation */}
-            <div className="pt-28 pb-4 px-6 border-b border-border bg-muted/10">
-                <div className="container mx-auto flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap overflow-x-auto">
-                    <Link to="/shop" className="hover:text-primary transition-colors flex items-center gap-1">
-                        <ArrowLeft size={12} /> Back to Shop
+            <div className="pt-8 pb-2 px-4 sm:px-6">
+                <div className="container mx-auto flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold text-zinc-400 whitespace-nowrap overflow-x-auto font-sans tracking-wide">
+                    <Link to="/shop" className="hover:text-black transition-colors flex items-center gap-1 text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-zinc-500">
+                        <ArrowLeft size={11} className="shrink-0" /> Shop
                     </Link>
-                    <ChevronRight size={12} />
-                    <Link to="/shop" className="hover:text-primary transition-colors">{product.gender}</Link>
-                    <ChevronRight size={12} />
-                    <Link to="/shop" className="hover:text-primary transition-colors">{product.category}</Link>
-                    <ChevronRight size={12} />
-                    <span className="text-foreground truncate">{product.name}</span>
+                    <ChevronRight size={9} className="text-zinc-300 shrink-0" />
+                    <span className="capitalize">{product.gender}</span>
+                    <ChevronRight size={9} className="text-zinc-300 shrink-0" />
+                    <span className="capitalize">{product.category}</span>
+                    <ChevronRight size={9} className="text-zinc-300 shrink-0" />
+                    <span className="text-zinc-800 font-bold truncate">{product.name}</span>
                 </div>
             </div>
 
-            <div className="container mx-auto px-6 py-12">
-                <div className="flex flex-col lg:flex-row gap-12 xl:gap-20">
+            <div className="container mx-auto px-4 sm:px-6 py-8">
+                <div className="flex flex-col lg:flex-row gap-10 xl:gap-16">
                     
                     {/* Left Frame: Image Gallery */}
-                    <div className="w-full lg:w-1/2 flex flex-col select-none">
-                        {/* Primary Image View */}
-                        <div className="w-full aspect-[4/5] sm:aspect-square lg:aspect-[4/5] bg-muted/30 rounded-md border border-border overflow-hidden relative mb-4">
-                            {product.stock === 0 && (
-                                <div className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded shadow-sm">
-                                    Out of Stock
-                                </div>
-                            )}
-                            {product.stock > 0 && product.discountPrice && (
-                                <div className="absolute top-4 left-4 z-10 bg-emerald-500 text-white text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded shadow-sm">
-                                    Sale
-                                </div>
-                            )}
-                            {activeImage ? (
-                                <motion.img 
-                                    key={activeImage}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.3 }}
-                                    src={activeImage} 
-                                    alt={product.name} 
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-muted-foreground opacity-30">
-                                    <Package className="w-16 h-16" />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Image Thumbnails Row */}
+                    <div className="w-[85%] md:w-full lg:w-[46%] xl:w-[42%] mx-auto md:mx-0 flex flex-col md:flex-row gap-4 select-none lg:max-w-[480px] xl:max-w-[520px]">
+                        {/* Image Thumbnails Row / Column */}
                         {availableImages.length > 1 && (
-                            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+                            <div className="flex md:flex-col gap-3 order-2 md:order-1 overflow-x-auto md:overflow-x-visible md:overflow-y-auto pb-2 md:pb-0 scrollbar-none w-full md:w-24 shrink-0">
                                 {availableImages.map((imgUrl, index) => (
                                     <button 
                                         key={index}
                                         onClick={() => setActiveImage(imgUrl)}
-                                        className={`shrink-0 w-20 sm:w-24 aspect-[4/5] rounded overflow-hidden border-2 transition-all ${activeImage === imgUrl ? "border-primary opacity-100" : "border-transparent opacity-60 hover:opacity-100"}`}
+                                        className={`shrink-0 w-16 md:w-full aspect-[4/5] rounded-xl overflow-hidden border-2 transition-all duration-300 ${activeImage === imgUrl ? "border-orange-500 scale-[1.03] shadow-md shadow-orange-500/10" : "border-zinc-200/60 opacity-60 hover:opacity-100"}`}
                                     >
                                         <img src={imgUrl} alt={`${product.name} Preview ${index+1}`} className="w-full h-full object-cover" />
                                     </button>
                                 ))}
                             </div>
                         )}
+
+                        {/* Primary Image View */}
+                        <div className="flex-1 order-1 md:order-2 aspect-[4/5] bg-zinc-50 rounded-2xl border border-zinc-100 overflow-hidden relative shadow-sm group">
+                            {product.stock === 0 && (
+                                <div className="absolute top-4 left-4 z-10 bg-black text-white text-[10px] font-black uppercase tracking-[0.25em] px-3.5 py-2 rounded-full shadow-sm">
+                                    Out of Stock
+                                </div>
+                            )}
+                            {product.stock > 0 && product.discountPrice && (
+                                <div className="absolute top-4 left-4 z-10 bg-orange-600 text-white text-[10px] font-black uppercase tracking-[0.25em] px-3.5 py-2 rounded-full shadow-sm animate-pulse">
+                                    Sale
+                                </div>
+                            )}
+                            {activeImage ? (
+                                <motion.img 
+                                    key={activeImage}
+                                    initial={{ opacity: 0, scale: 0.98 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.3 }}
+                                    src={activeImage} 
+                                    alt={product.name} 
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-zinc-300">
+                                    <Package className="w-16 h-16 opacity-30" />
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Right Frame: Details and Action */}
                     <motion.div 
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="w-full lg:w-1/2 flex flex-col"
+                        transition={{ duration: 0.5 }}
+                        className="w-full lg:w-[54%] xl:w-[58%] flex flex-col font-sans"
                     >
-                        <div className="mb-8">
-                            <p className="text-xs font-bold tracking-[0.3em] uppercase text-muted-foreground mb-3">{product.category}</p>
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 leading-tight">{product.name}</h1>
+                        <div className="mb-6">
+                            <span className="inline-block text-[10px] font-extrabold tracking-[0.25em] uppercase text-orange-600 bg-orange-50 px-3 py-1.5 rounded-full mb-3">
+                                {product.category}
+                            </span>
+                            <h1 className="text-xl sm:text-3xl lg:text-[40px] font-normal uppercase tracking-wider text-zinc-950 mb-3 leading-[1.1]">
+                                {product.name}
+                            </h1>
                             
                             <div className="flex items-end gap-3 mb-6">
-                                <span className="text-3xl font-black">
+                                <span className="text-2xl sm:text-3xl font-semibold text-zinc-950">
                                     ${product.discountPrice || product.price}
                                 </span>
                                 {product.discountPrice && (
-                                    <span className="text-xl text-muted-foreground line-through font-medium mb-1 border-red-500/50">
+                                    <span className="text-sm sm:text-lg text-zinc-400 line-through font-normal mb-1">
                                         ${product.price}
                                     </span>
                                 )}
                             </div>
                             
-                            <div className="w-full h-px bg-border my-6"></div>
+                            <div className="w-full h-px bg-zinc-100 my-5"></div>
                             
-                            <div className="prose prose-invert prose-sm font-mono text-muted-foreground leading-relaxed max-w-none">
+                            <div className="text-zinc-600 text-sm leading-relaxed max-w-none font-medium">
                                 <p>{product.description}</p>
                             </div>
                         </div>
 
                         {/* Sizing Information */}
-                        <div className="mb-8">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-xs font-bold uppercase tracking-[0.2em]">Select Size</h3>
-                                <button className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-muted-foreground hover:text-foreground transition-all">Size Guide</button>
+                        <div className="mb-6">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-zinc-800">Select Size</h3>
+                                <button className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-200 hover:text-black hover:border-black transition-all">Size Guide</button>
                             </div>
                             
                             {product.sizes && product.sizes.length > 0 ? (
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2.5">
                                     {product.sizes.map((size) => (
                                         <button 
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
-                                            className={`h-12 min-w-[3rem] px-4 border rounded font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed ${selectedSize === size ? "bg-primary border-primary text-primary-foreground" : "border-border hover:border-primary/50 text-foreground"}`}
+                                            className={`h-11 min-w-[2.75rem] px-3.5 rounded-xl border-2 font-black uppercase tracking-wider text-xs transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed ${selectedSize === size ? "bg-black border-black text-white shadow-md shadow-black/10 scale-105" : "border-zinc-200 hover:border-zinc-800 text-zinc-700 hover:text-black"}`}
                                             disabled={product.stock === 0}
                                         >
                                             {size}
@@ -248,66 +262,67 @@ const ProductDetails = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="h-12 inline-flex items-center px-6 border border-border rounded font-bold uppercase tracking-wider text-muted-foreground cursor-not-allowed">
+                                <div className="h-11 inline-flex items-center px-5 border border-zinc-200 rounded-xl font-bold uppercase tracking-wider text-xs text-zinc-400 cursor-not-allowed">
                                     One Size
                                 </div>
                             )}
                         </div>
 
                         {/* Status Message */}
-                        <div className="mb-8">
+                        <div className="mb-6">
                             {product.stock > 0 ? (
-                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-500 flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Item is in Stock
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 border border-emerald-100">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ready to Dispatch
                                 </p>
                             ) : (
-                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500 flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-red-500"></span> Currently Out of Stock
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 bg-red-50 px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 border border-red-100">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> Sold Out
                                 </p>
                             )}
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 mt-auto">
+                        <div className="flex flex-col sm:flex-row gap-3.5 mt-2">
                             <button 
                                 onClick={handleAddToCart}
                                 disabled={product.stock === 0}
-                                className="flex-1 h-14 bg-background border border-border rounded flex items-center justify-center gap-2 font-black uppercase tracking-[0.2em] text-sm hover:border-foreground hover:bg-muted/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full sm:flex-1 h-12 sm:h-14 shrink-0 bg-zinc-50 border-2 border-zinc-200 hover:border-black rounded-full flex items-center justify-center gap-2 font-bold uppercase tracking-[0.2em] text-xs hover:bg-black hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                             >
-                                <ShoppingBag size={16} /> Add to Cart
+                                <ShoppingBag size={15} /> Add to Cart
                             </button>
                             <button 
                                 onClick={handleBuyNow}
                                 disabled={product.stock === 0}
-                                className="flex-1 h-14 gradient-btn rounded font-black uppercase tracking-[0.2em] text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full sm:flex-1 h-12 sm:h-14 shrink-0 bg-orange-600 hover:bg-orange-700 text-white rounded-full font-bold uppercase tracking-[0.2em] text-xs shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                             >
                                 Buy It Now
                             </button>
                         </div>
                         
                         {/* Guarantee Badges */}
-                        <div className="mt-8 pt-8 border-t border-border grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                            <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Secure</span>
-                                <span className="text-xs font-bold">Checkout</span>
+                        <div className="mt-8 pt-6 border-t border-zinc-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                            <div className="flex flex-col items-center">
+                                <span className="block text-[8px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-1">Secure</span>
+                                <span className="text-xs font-bold text-zinc-800">SSL Checkout</span>
                             </div>
-                            <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Fast</span>
-                                <span className="text-xs font-bold">Shipping</span>
+                            <div className="flex flex-col items-center">
+                                <span className="block text-[8px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-1">Fast</span>
+                                <span className="text-xs font-bold text-zinc-800">48h Dispatch</span>
                             </div>
-                            <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Quality</span>
-                                <span className="text-xs font-bold">Apparel</span>
+                            <div className="flex flex-col items-center">
+                                <span className="block text-[8px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-1">Quality</span>
+                                <span className="text-xs font-bold text-zinc-800">Heavy Cotton</span>
                             </div>
-                            <div>
-                                <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Base</span>
-                                <span className="text-xs font-bold">Guarantee</span>
+                            <div className="flex flex-col items-center">
+                                <span className="block text-[8px] font-black uppercase tracking-[0.25em] text-zinc-400 mb-1">Authentic</span>
+                                <span className="text-xs font-bold text-zinc-800">Original Base</span>
                             </div>
                         </div>
 
                     </motion.div>
                 </div>
             </div>
+            <FooterSection />
         </div>
     );
 };

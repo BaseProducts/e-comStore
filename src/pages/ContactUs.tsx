@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react";
+import { Send, Phone, Mail, MapPin, CheckCircle2, MessageSquare, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import FooterSection from "../components/FooterSection";
+import SEO from "../components/SEO";
 import { BASE_URL, authHeaders } from "@/lib/utils";
 
 const ContactUs = () => {
@@ -15,7 +17,6 @@ const ContactUs = () => {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-
     const [user, setUser] = useState<{name?: string, email?: string} | null>(null);
 
     // Run once to grab user session
@@ -77,193 +78,264 @@ const ContactUs = () => {
     };
 
     return (
-        <div className="min-h-screen bg-background font-mono selection:bg-primary/30">
+        <div className="min-h-screen bg-zinc-50 flex flex-col font-sans selection:bg-orange-500/30">
+            <SEO 
+                title="Contact Support | Reach Out to Us"
+                description="Have queries about order shipping, garments size guides, or brand collaborations? Send us a direct support message."
+                keywords="contact base products, base products support, base products location, base customer care, baseproducts.online contact"
+                canonicalUrl="https://baseproducts.online/contact"
+            />
             <Navbar />
 
-            <div className="pt-32 pb-20 md:pt-40 px-6">
-                <div className="container mx-auto max-w-6xl">
-                    <motion.div 
+            {/* Page Header */}
+            <section className="bg-zinc-950 text-white py-16 px-6 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800/40 via-zinc-950 to-zinc-950 opacity-80 z-0"></div>
+                <div className="container mx-auto max-w-4xl relative z-10 text-center space-y-4">
+                    <motion.span 
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-orange-500 font-black uppercase tracking-[0.25em] text-[10px] bg-orange-950/40 border border-orange-900/50 px-3 py-1 rounded-full inline-block"
+                    >
+                        Get In Touch
+                    </motion.span>
+                    <motion.h1 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center mb-16"
+                        transition={{ delay: 0.1 }}
+                        className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white"
                     >
-                        <p className="text-primary font-bold uppercase tracking-[0.3em] text-xs mb-4">Get In Touch</p>
-                        <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">Contact <span className="gradient-text">Base</span></h1>
-                        <p className="text-muted-foreground max-w-lg mx-auto text-sm md:text-base leading-relaxed">
-                            Have questions about our mission, sizing, or an existing order? Drop us a message below and our team will get back to you.
-                        </p>
-                    </motion.div>
+                        Contact <span className="text-orange-500">Base</span>
+                    </motion.h1>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-zinc-400 max-w-md mx-auto text-xs md:text-sm uppercase tracking-wider font-semibold leading-relaxed"
+                    >
+                        Have questions about sizing, a drop, or your order? We are here to support your journey.
+                    </motion.p>
+                </div>
+            </section>
 
-                    <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
-                        {/* Contact Information */}
-                        <motion.div 
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="lg:w-1/3 space-y-10"
-                        >
-                            <div>
-                                <h3 className="text-xl font-bold uppercase tracking-widest mb-6">Contact Info</h3>
-                                <div className="space-y-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-10 h-10 bg-muted/30 rounded flex items-center justify-center shrink-0 border border-border">
-                                            <Mail size={18} className="text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Email</p>
-                                            <a href="mailto:basecustomer2018@gmail.com" className="hover:text-primary transition-colors">basecustomer2018@gmail.com</a>
-                                        </div>
+            {/* Form & Contact Details Section */}
+            <div className="flex-1 container mx-auto max-w-6xl px-4 md:px-6 py-12 md:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                    
+                    {/* Left Column: Contact Cards */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="lg:col-span-4 space-y-6"
+                    >
+                        {/* Info list */}
+                        <div className="bg-white border border-zinc-200/80 rounded-2xl p-6 shadow-sm space-y-6">
+                            <h3 className="text-xs font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-100 pb-3">
+                                Support Channels
+                            </h3>
+                            
+                            <div className="space-y-6">
+                                {/* Email */}
+                                <div className="flex gap-4">
+                                    <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0 border border-orange-100/50">
+                                        <Mail size={18} className="text-orange-600" />
                                     </div>
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-10 h-10 bg-muted/30 rounded flex items-center justify-center shrink-0 border border-border">
-                                            <Phone size={18} className="text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Phone</p>
-                                            <a href="tel:+14242063358" className="hover:text-primary transition-colors">+1(424)-206-3358</a>
-                                        </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">Email Support</p>
+                                        <a href="mailto:basecustomer2018@gmail.com" className="text-sm font-bold text-zinc-800 hover:text-orange-600 transition-colors break-all">
+                                            basecustomer2018@gmail.com
+                                        </a>
                                     </div>
-                                    <div className="flex items-start gap-4">
-                                        <div className="w-10 h-10 bg-muted/30 rounded flex items-center justify-center shrink-0 border border-border">
-                                            <MapPin size={18} className="text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Location</p>
-                                            <p>Torrance, CA</p>
-                                        </div>
+                                </div>
+
+                                {/* Phone */}
+                                <div className="flex gap-4">
+                                    <div className="w-10 h-10 bg-zinc-50 rounded-xl flex items-center justify-center shrink-0 border border-zinc-200/60">
+                                        <Phone size={18} className="text-zinc-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">Direct Line</p>
+                                        <a href="tel:+14242063358" className="text-sm font-bold text-zinc-800 hover:text-orange-600 transition-colors">
+                                            +1 (424) 206-3358
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {/* Location */}
+                                <div className="flex gap-4">
+                                    <div className="w-10 h-10 bg-zinc-50 rounded-xl flex items-center justify-center shrink-0 border border-zinc-200/60">
+                                        <MapPin size={18} className="text-zinc-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">Origin</p>
+                                        <p className="text-sm font-bold text-zinc-800">
+                                            Torrance, CA
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="p-8 bg-muted/10 border border-border rounded-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full pointer-events-none"></div>
-                                <h4 className="font-bold uppercase tracking-widest mb-3 relative z-10">Customer Support</h4>
-                                <p className="text-sm text-muted-foreground mb-4 relative z-10">Our typical response time is within 24-48 business hours.</p>
-                                <p className="text-xs font-bold uppercase tracking-widest text-primary relative z-10">Mon - Fri, 9am - 5pm PST</p>
+                        {/* Working hours banner */}
+                        <div className="bg-zinc-950 text-white rounded-2xl p-6 relative overflow-hidden shadow-lg border border-zinc-800">
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                            <div className="flex items-center gap-3 mb-4">
+                                <Clock size={20} className="text-orange-500" />
+                                <h4 className="text-sm font-black uppercase tracking-widest">Support Hours</h4>
                             </div>
-                        </motion.div>
+                            <p className="text-xs text-zinc-400 mb-4 leading-relaxed font-sans font-medium">
+                                Our support staff responds within 24-48 business hours to ensure your needs are fully addressed.
+                            </p>
+                            <div className="text-xs font-bold uppercase tracking-widest text-orange-500 border-t border-zinc-800 pt-3 flex justify-between">
+                                <span>Mon - Fri</span>
+                                <span>9am - 5pm PST</span>
+                            </div>
+                        </div>
+                    </motion.div>
 
-                        {/* Contact Form */}
-                        <motion.div 
-                            initial={{ opacity: 0, x: 30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6, delay: 0.4 }}
-                            className="lg:w-2/3"
-                        >
-                            <AnimatePresence mode="wait">
-                                {isSuccess ? (
-                                    <motion.div 
-                                        key="success"
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="h-full flex flex-col items-center justify-center bg-muted/10 border border-border rounded-sm p-12 text-center"
+                    {/* Right Column: Interactive Form */}
+                    <motion.div 
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                        className="lg:col-span-8 bg-white border border-zinc-200/80 rounded-2xl p-6 md:p-8 shadow-sm"
+                    >
+                        <AnimatePresence mode="wait">
+                            {isSuccess ? (
+                                <motion.div 
+                                    key="success"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="flex flex-col items-center justify-center py-16 text-center"
+                                >
+                                    <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 mb-6 animate-bounce">
+                                        <CheckCircle2 size={32} className="text-emerald-600" />
+                                    </div>
+                                    <h3 className="text-xl font-black uppercase tracking-widest text-zinc-800 mb-2">Message Sent!</h3>
+                                    <p className="text-zinc-550 text-xs uppercase tracking-wider font-semibold max-w-sm leading-relaxed">
+                                        We have received your request and will reach back out shortly. Thank you.
+                                    </p>
+                                </motion.div>
+                            ) : !user ? (
+                                <motion.div 
+                                    key="locked"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="flex flex-col items-center justify-center py-12 text-center"
+                                >
+                                    <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center border border-orange-100 mb-6">
+                                        <MessageSquare size={32} className="text-orange-600" />
+                                    </div>
+                                    <h3 className="text-xl font-black uppercase tracking-widest text-zinc-850 mb-2">Members Only</h3>
+                                    <p className="text-zinc-500 text-xs uppercase tracking-wider font-semibold max-w-xs mb-8 leading-relaxed">
+                                        You must have a registered account to submit support requests.
+                                    </p>
+                                    <Link 
+                                        to="/auth" 
+                                        className="py-4 px-10 bg-zinc-950 text-white text-xs font-black uppercase tracking-widest rounded-full hover:bg-orange-600 transition-colors shadow-md hover:-translate-y-0.5 transform duration-300"
                                     >
-                                        <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6">
-                                            <CheckCircle2 size={32} className="text-emerald-500" />
-                                        </div>
-                                        <h3 className="text-2xl font-black uppercase tracking-widest mb-3">Message Received</h3>
-                                        <p className="text-muted-foreground">Thank you for reaching out to Base. We have securely received your message and will be in touch shortly.</p>
-                                    </motion.div>
-                                ) : !user ? (
-                                    <motion.div 
-                                        key="locked"
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="h-full flex flex-col items-center justify-center bg-muted/10 border border-border rounded-sm p-12 text-center"
-                                    >
-                                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                                            <Send size={32} className="text-primary" />
-                                        </div>
-                                        <h3 className="text-2xl font-black uppercase tracking-widest mb-3">Members Only</h3>
-                                        <p className="text-muted-foreground mb-8 max-w-sm">You must have a verified account to contact support and open tickets.</p>
-                                        <Link to="/auth" className="gradient-btn font-bold tracking-[0.2em] uppercase py-4 px-10 rounded-sm inline-flex items-center justify-center gap-3">
-                                            Login / Sign Up
-                                        </Link>
-                                    </motion.div>
-                                ) : (
-                                    <motion.form 
-                                        key="form"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        onSubmit={handleSubmit} 
-                                        className="space-y-6"
-                                    >
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Full Name <span className="text-red-500">*</span></label>
-                                                <input 
-                                                    type="text" 
-                                                    name="name"
-                                                    value={formData.name}
-                                                    onChange={handleChange}
-                                                    required
-                                                    className="w-full bg-background border border-border rounded p-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                                                    placeholder="John Doe"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Email Address <span className="text-red-500">*</span></label>
-                                                <input 
-                                                    type="email" 
-                                                    name="email"
-                                                    value={formData.email}
-                                                    onChange={handleChange}
-                                                    disabled
-                                                    required
-                                                    className="w-full bg-background border border-border rounded p-3 text-sm focus:outline-none focus:border-primary transition-colors cursor-not-allowed opacity-70"
-                                                    placeholder="john@example.com"
-                                                />
-                                            </div>
-                                        </div>
+                                        Log In / Register
+                                    </Link>
+                                </motion.div>
+                            ) : (
+                                <motion.form 
+                                    key="form"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onSubmit={handleSubmit} 
+                                    className="space-y-6"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Full Name */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Phone Number <span className="text-red-500">*</span></label>
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                                Full Name <span className="text-red-500">*</span>
+                                            </label>
                                             <input 
-                                                type="tel" 
-                                                name="phone"
-                                                value={formData.phone}
-                                                required
+                                                type="text" 
+                                                name="name"
+                                                value={formData.name}
                                                 onChange={handleChange}
-                                                className="w-full bg-background border border-border rounded p-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                                                placeholder="(123) 456-7890"
+                                                required
+                                                className="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all font-medium"
+                                                placeholder="Enter your name"
                                             />
                                         </div>
+
+                                        {/* Email (Disabled/Locked) */}
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Message <span className="text-red-500">*</span></label>
-                                            <textarea 
-                                                name="message"
-                                                value={formData.message}
-                                                onChange={handleChange}
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                                Email Address <span className="text-zinc-400">(Locked)</span>
+                                            </label>
+                                            <input 
+                                                type="email" 
+                                                name="email"
+                                                value={formData.email}
+                                                disabled
                                                 required
-                                                rows={6}
-                                                className="w-full bg-background border border-border rounded p-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none"
-                                                placeholder="How can we help you today?"
-                                            ></textarea>
+                                                className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-sm text-zinc-500 cursor-not-allowed opacity-75 font-medium"
+                                                placeholder="your.email@example.com"
+                                            />
                                         </div>
-                                        <button 
-                                            type="submit" 
-                                            disabled={isSubmitting}
-                                            className="w-full gradient-btn font-bold tracking-[0.2em] uppercase py-4 rounded-sm flex items-center justify-center gap-3 transition-opacity disabled:opacity-50"
-                                        >
-                                            {isSubmitting ? (
-                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                            ) : (
-                                                <>
-                                                    Send Message
-                                                    <Send size={16} />
-                                                </>
-                                            )}
-                                        </button>
-                                    </motion.form>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-                    </div>
+                                    </div>
+
+                                    {/* Phone Number */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                            Phone Number <span className="text-red-500">*</span>
+                                        </label>
+                                        <input 
+                                            type="tel" 
+                                            name="phone"
+                                            value={formData.phone}
+                                            required
+                                            onChange={handleChange}
+                                            className="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all font-medium"
+                                            placeholder="(123) 456-7890"
+                                        />
+                                    </div>
+
+                                    {/* Message */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                            Message <span className="text-red-500">*</span>
+                                        </label>
+                                        <textarea 
+                                            name="message"
+                                            value={formData.message}
+                                            onChange={handleChange}
+                                            required
+                                            rows={6}
+                                            className="w-full bg-zinc-50 border border-zinc-200/80 rounded-xl p-4 text-sm focus:outline-none focus:border-orange-500 focus:bg-white transition-all resize-none font-medium"
+                                            placeholder="What is your message or inquiry about?"
+                                        ></textarea>
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <button 
+                                        type="submit" 
+                                        disabled={isSubmitting}
+                                        className="w-full py-4 bg-zinc-950 text-white text-xs font-black uppercase tracking-widest rounded-full hover:bg-orange-650 transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none"
+                                    >
+                                        {isSubmitting ? (
+                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        ) : (
+                                            <>
+                                                Send Message
+                                                <Send size={14} />
+                                            </>
+                                        )}
+                                    </button>
+                                </motion.form>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
                 </div>
             </div>
+            <FooterSection />
         </div>
     );
 };

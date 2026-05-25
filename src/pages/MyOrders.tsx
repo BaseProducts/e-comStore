@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import FooterSection from "../components/FooterSection";
 import { motion } from "framer-motion";
 import { ShoppingBag, ChevronRight, Package, Truck, CheckCircle, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -67,7 +68,7 @@ const MyOrders = () => {
         <div className="min-h-screen bg-background font-mono selection:bg-primary/30">
             <Navbar />
             
-            <main className="container mx-auto px-6 pt-32 pb-20">
+            <main className="container mx-auto px-6 pt-10 pb-20">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -181,6 +182,7 @@ const MyOrders = () => {
                     )}
                 </motion.div>
             </main>
+            <FooterSection />
         </div>
     );
 };

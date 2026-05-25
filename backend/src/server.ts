@@ -42,9 +42,27 @@ if (isProduction) {
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
-// Middleware
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,
+  "https://baseproducts.online"
+].filter((origin): origin is string => !!origin);
+
 app.use(cors({
-  origin: [process.env.CORS_ORIGIN || "*", "https://baseproducts.online"],
+  origin: (origin, callback) => {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    const isLocal = origin.startsWith("http://localhost:") || 
+                    origin.startsWith("http://127.0.0.1:") || 
+                    origin === "http://localhost" || 
+                    origin === "http://127.0.0.1";
+    if (isLocal || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));
