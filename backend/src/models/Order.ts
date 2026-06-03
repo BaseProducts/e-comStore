@@ -24,7 +24,7 @@ interface OrderAttributes {
   stripePaymentIntentId: string | null;
 }
 
-interface OrderCreationAttributes extends Omit<OrderAttributes, 'id' | 'status' | 'paymentStatus' | 'stripeSessionId' | 'stripePaymentIntentId'> {
+interface OrderCreationAttributes extends Omit<OrderAttributes, 'id' | 'status' | 'statusMessage' | 'paymentStatus' | 'stripeSessionId' | 'stripePaymentIntentId'> {
   status?: string;
   paymentStatus?: string;
   stripeSessionId?: string | null;
