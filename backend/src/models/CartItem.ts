@@ -9,16 +9,20 @@ interface CartItemAttributes {
   userId: string;
   productId: string;
   size: string;
+  color: string;
+  variantInfo: string;
   quantity: number;
 }
 
-interface CartItemCreationAttributes extends Optional<CartItemAttributes, 'id' | 'quantity'> {}
+interface CartItemCreationAttributes extends Optional<CartItemAttributes, 'id' | 'quantity' | 'color' | 'variantInfo'> {}
 
 class CartItem extends Model<CartItemAttributes, CartItemCreationAttributes> implements CartItemAttributes {
   declare public id: string;
   declare public userId: string;
   declare public productId: string;
   declare public size: string;
+  declare public color: string;
+  declare public variantInfo: string;
   declare public quantity: number;
 
   declare public readonly createdAt: Date;
@@ -43,6 +47,16 @@ CartItem.init(
     size: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    color: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: '',
+    },
+    variantInfo: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '{}',
     },
     quantity: {
       type: DataTypes.INTEGER,

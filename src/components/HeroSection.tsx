@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import bannerImage from "@/assets/banner1.png";
 import bannerImage2 from "@/assets/banner2.png";
 import bannerImage3 from "@/assets/banner3.png";
+import { BASE_URL } from "@/lib/utils";
 const slides = [
   { image: bannerImage },
   { image: bannerImage2 },
@@ -12,20 +13,44 @@ const slides = [
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
+  const [dynamicSlides, setDynamicSlides] = useState([
+    { image: bannerImage },
+    { image: bannerImage2 },
+    { image: bannerImage3 },
+  ]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/settings`);
+        const { data } = await res.json();
+        if (data) {
+          setDynamicSlides([
+            { image: data.banner_image_1 || bannerImage },
+            { image: data.banner_image_2 || bannerImage2 },
+            { image: data.banner_image_3 || bannerImage3 },
+          ]);
+        }
+      } catch (e) {
+        console.error("Failed to fetch settings", e);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
+      setCurrent((prev) => (prev + 1) % dynamicSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [dynamicSlides.length]);
 
   const handlePrev = () => {
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrent((prev) => (prev - 1 + dynamicSlides.length) % dynamicSlides.length);
   };
 
   const handleNext = () => {
-    setCurrent((prev) => (prev + 1) % slides.length);
+    setCurrent((prev) => (prev + 1) % dynamicSlides.length);
   };
 
   return (
@@ -42,7 +67,7 @@ const HeroSection = () => {
             className="absolute inset-0 w-full h-full"
           >
             <img
-              src={slides[current].image}
+              src={dynamicSlides[current].image}
               alt={`Banner ${current + 1}`}
               className="w-full h-full object-cover"
             />
@@ -68,7 +93,7 @@ const HeroSection = () => {
 
       {/* Centered Indicators */}
       <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, index) => (
+        {dynamicSlides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrent(index)}

@@ -48,7 +48,7 @@ const TestimonialsSection = () => {
             The Voice of Base
           </h2>
           <p className="text-sm text-zinc-500 max-w-md mx-auto">
-            Read stories from believers around the world sharing their faith through premium streetwear.
+            Hear from people who wear their faith boldly and carry a message of purpose through Base Products.
           </p>
         </motion.div>
 
@@ -86,7 +86,7 @@ const TestimonialsSection = () => {
               {/* Reviewer Details */}
               <div className="border-t border-zinc-100 pt-4 flex items-center gap-3">
                 {/* Avatar Initials */}
-                <div className="w-9 h-9 rounded-full bg-orange-50 text-orange-600 font-bold text-xs flex items-center justify-center flex-shrink-0 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                <div className="w-9 h-9 rounded-full bg-orange-50 text-orange-600 font-bold text-xs flex items-center justify-center flex-shrink-0">
                   {review.initials}
                 </div>
 
@@ -95,7 +95,7 @@ const TestimonialsSection = () => {
                     <p className="text-xs font-bold text-zinc-900 truncate">
                       {review.author}
                     </p>
-                    <CheckCircle size={12} className="text-emerald-500 fill-emerald-50" title="Verified Purchase" />
+                    <CheckCircle size={12} className="text-emerald-500 fill-emerald-50" aria-label="Verified Purchase" />
                   </div>
                   <p className="text-[10px] text-zinc-400 truncate">
                     {review.location}

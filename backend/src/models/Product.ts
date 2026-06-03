@@ -12,6 +12,7 @@ interface ProductAttributes {
   gender: string;
   imageUrls: string[];
   sizes: string[];
+  customFields: Record<string, any>[];
   stock: number;
   isFeatured: boolean;
   isVisible: boolean;
@@ -19,7 +20,7 @@ interface ProductAttributes {
   updatedAt?: Date;
 }
 
-interface ProductCreationAttributes extends Optional<ProductAttributes, 'id' | 'discountPrice' | 'imageUrls' | 'sizes' | 'isFeatured' | 'isVisible' | 'createdAt' | 'updatedAt'> {}
+interface ProductCreationAttributes extends Optional<ProductAttributes, 'id' | 'discountPrice' | 'imageUrls' | 'sizes' | 'customFields' | 'isFeatured' | 'isVisible' | 'createdAt' | 'updatedAt'> {}
 
 class Product extends Model<ProductAttributes, ProductCreationAttributes> implements ProductAttributes {
   declare public id: string;
@@ -31,6 +32,7 @@ class Product extends Model<ProductAttributes, ProductCreationAttributes> implem
   declare public gender: string;
   declare public imageUrls: string[];
   declare public sizes: string[];
+  declare public customFields: Record<string, any>[];
   declare public stock: number;
   declare public isFeatured: boolean;
   declare public isVisible: boolean;
@@ -77,6 +79,11 @@ Product.init(
       allowNull: false,
     },
     sizes: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+      allowNull: false,
+    },
+    customFields: {
       type: DataTypes.JSON,
       defaultValue: [],
       allowNull: false,

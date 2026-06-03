@@ -17,6 +17,7 @@ interface OrderAttributes {
   shipping: number;
   total: number;
   status: 'pending' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
+  statusMessage: string | null;
   paymentMethod: string;
   paymentStatus: 'pending' | 'paid' | 'failed';
   stripeSessionId: string | null;
@@ -28,6 +29,7 @@ interface OrderCreationAttributes extends Omit<OrderAttributes, 'id' | 'status' 
   paymentStatus?: string;
   stripeSessionId?: string | null;
   stripePaymentIntentId?: string | null;
+  statusMessage?: string | null;
 }
 
 class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
@@ -45,6 +47,7 @@ class Order extends Model<OrderAttributes, OrderCreationAttributes> implements O
   declare public shipping: number;
   declare public total: number;
   declare public status: 'pending' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
+  declare public statusMessage: string | null;
   declare public paymentMethod: string;
   declare public paymentStatus: 'pending' | 'paid' | 'failed';
   declare public stripeSessionId: string | null;
@@ -112,6 +115,10 @@ Order.init(
     status: {
       type: DataTypes.ENUM('pending', 'processing', 'packed', 'shipped', 'delivered', 'cancelled'),
       defaultValue: 'pending',
+    },
+    statusMessage: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     paymentMethod: {
       type: DataTypes.STRING,

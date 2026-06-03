@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
@@ -16,11 +16,27 @@ const Auth = () => {
     const { refreshCart } = useCart();
     const [mode, setMode] = useState<AuthMode>("login");
     const [isLoading, setIsLoading] = useState(false);
+    const [authBg, setAuthBg] = useState(banner1);
     
     // Form States
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [fullName, setFullName] = useState("");
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch(`${BASE_URL}/api/settings`);
+                const { data } = await res.json();
+                if (data?.banner_image_1) {
+                    setAuthBg(data.banner_image_1);
+                }
+            } catch (e) {
+                console.error("Failed to fetch settings", e);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,7 +94,7 @@ const Auth = () => {
                 {/* Background Image Overlay with Low Opacity */}
                 <div 
                     className="absolute inset-0 z-0 pointer-events-none opacity-[0.3] bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: `url(${banner1})` }}
+                    style={{ backgroundImage: `url(${authBg})` }}
                 />
                 <div className="w-full max-w-md relative z-10">
                     {/* Background Decorative Frame */}

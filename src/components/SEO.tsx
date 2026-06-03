@@ -53,7 +53,7 @@ const SEO = ({
         if (keywords) {
             updateMeta("keywords", keywords);
         } else {
-            updateMeta("keywords", "baseproducts, base products, christian streetwear, christian clothing, faith based clothing, base online store, streetwear, base garments");
+            updateMeta("keywords", "baseproducts, base products, christian apparel, faith-based clothing, kingdom of god apparel, base online store, christian brand, pastoral family los angeles");
         }
         updateMeta("robots", "index, follow");
 

@@ -75,8 +75,14 @@ export const getUserOrders = async (req: Request, res: Response) => {
 export const updateOrderStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    await Order.update({ status }, { where: { id } });
+    const { status, statusMessage } = req.body;
+    
+    const updateData: any = { status };
+    if (statusMessage !== undefined) {
+      updateData.statusMessage = statusMessage;
+    }
+
+    await Order.update(updateData, { where: { id } });
     res.status(200).json({ status: 'success', message: 'Order status updated' });
   } catch (error: any) {
     res.status(500).json({ status: 'error', message: error.message });

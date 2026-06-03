@@ -8,7 +8,7 @@ const router = Router();
 // Create a new product with multiple images
 router.post('/', upload.array('images'), async (req: Request, res: Response) => {
     try {
-        const { name, description, price, discountPrice, category, gender, stock, isFeatured, sizes } = req.body;
+        const { name, description, price, discountPrice, category, gender, stock, isFeatured, sizes, customFields } = req.body;
         
         const files = req.files as Express.Multer.File[];
         const imageUrls: string[] = [];
@@ -29,6 +29,15 @@ router.post('/', upload.array('images'), async (req: Request, res: Response) => 
             }
         }
 
+        let parsedCustomFields: Record<string, any>[] = [];
+        if (customFields) {
+            try {
+                parsedCustomFields = typeof customFields === 'string' ? JSON.parse(customFields) : customFields;
+            } catch (e) {
+                parsedCustomFields = [];
+            }
+        }
+
         const newProduct = await Product.create({
             name,
             description,
@@ -39,7 +48,8 @@ router.post('/', upload.array('images'), async (req: Request, res: Response) => 
             stock: parseInt(stock) || 0,
             isFeatured: isFeatured === 'true',
             imageUrls,
-            sizes: parsedSizes
+            sizes: parsedSizes,
+            customFields: parsedCustomFields
         });
 
         res.status(201).json(newProduct);
@@ -116,7 +126,7 @@ router.patch('/:id/toggle-visibility', async (req: Request, res: Response) => {
 router.put('/:id', upload.array('images'), async (req: Request, res: Response) => {
     try {
         const id = req.params.id as string;
-        const { name, description, price, discountPrice, category, gender, stock, isFeatured, sizes, existingImages } = req.body;
+        const { name, description, price, discountPrice, category, gender, stock, isFeatured, sizes, customFields, existingImages } = req.body;
         
         const product = await Product.findByPk(id);
         if (!product) {
@@ -152,6 +162,15 @@ router.put('/:id', upload.array('images'), async (req: Request, res: Response) =
             }
         }
 
+        let parsedCustomFields: Record<string, any>[] = [];
+        if (customFields) {
+            try {
+                parsedCustomFields = typeof customFields === 'string' ? JSON.parse(customFields) : customFields;
+            } catch (e) {
+                parsedCustomFields = [];
+            }
+        }
+
         await product.update({
             name,
             description,
@@ -162,7 +181,8 @@ router.put('/:id', upload.array('images'), async (req: Request, res: Response) =
             stock: stock ? parseInt(stock) : product.stock,
             isFeatured: isFeatured === 'true',
             imageUrls: imageUrls.length > 0 ? imageUrls : product.imageUrls,
-            sizes: parsedSizes.length > 0 ? parsedSizes : product.sizes
+            sizes: parsedSizes.length > 0 ? parsedSizes : product.sizes,
+            customFields: parsedCustomFields
         });
 
         res.status(200).json(product);

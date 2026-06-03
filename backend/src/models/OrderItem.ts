@@ -11,6 +11,8 @@ interface OrderItemAttributes {
   price: number;
   quantity: number;
   size: string;
+  color: string;
+  variantInfo: string;
   image: string;
 }
 
@@ -24,6 +26,8 @@ class OrderItem extends Model<OrderItemAttributes, OrderItemCreationAttributes> 
   declare public price: number;
   declare public quantity: number;
   declare public size: string;
+  declare public color: string;
+  declare public variantInfo: string;
   declare public image: string;
 }
 
@@ -57,6 +61,16 @@ OrderItem.init(
     size: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    color: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: '',
+    },
+    variantInfo: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '{}',
     },
     image: {
       type: DataTypes.STRING,

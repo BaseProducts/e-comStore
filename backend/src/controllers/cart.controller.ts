@@ -43,15 +43,15 @@ export const addToCart = async (req: Request, res: Response) => {
       return res.status(401).json({ status: 'error', message: 'Invalid session. Please login again.' });
     }
 
-    const { productId, size, quantity = 1 } = req.body;
+    const { productId, size, color = '', variantInfo = '{}', quantity = 1 } = req.body;
 
     if (!productId || !size) {
       return res.status(400).json({ message: 'Product ID and size are required' });
     }
 
-    // Check if the same product and size already exists in the cart
+    // Check if the same product + size + color + variant already exists in the cart
     let cartItem = await CartItem.findOne({
-      where: { userId, productId, size },
+      where: { userId, productId, size, color, variantInfo },
     });
 
     if (cartItem) {
@@ -62,6 +62,8 @@ export const addToCart = async (req: Request, res: Response) => {
         userId,
         productId,
         size,
+        color,
+        variantInfo,
         quantity,
       });
     }

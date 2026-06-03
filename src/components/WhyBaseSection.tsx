@@ -5,33 +5,33 @@ import { Link } from "react-router-dom";
 const pillars = [
   {
     icon: Cross,
-    title: "Faith-First Identity",
-    desc: "Every design tells a story of faith, designed to spark meaningful spiritual conversations.",
+    title: "Founded on God's Word",
+    desc: "Every design is rooted in the principles of Scripture, with Christ at the center of everything we create.",
   },
   {
     icon: Gem,
-    title: "Premium Heavyweight Fabric",
-    desc: "We source custom, premium-grade cotton blends for maximum durability, fit, and everyday comfort.",
+    title: "Excellence & Quality",
+    desc: "We honor God through excellence — premium fabrics, meticulous craftsmanship, and designs built to last.",
   },
   {
     icon: Leaf,
-    title: "Ethically Sourced",
-    desc: "Our materials are sourced using fair labor standards and printed with eco-friendly ink processes.",
+    title: "Strengthening Identity",
+    desc: "Our mission is to help build a strong Christian identity, encouraging men, women, and families to live out the Gospel.",
   },
   {
     icon: MessageSquare,
-    title: "Minimal Design, Max Message",
-    desc: "Striking the perfect balance between clean contemporary streetwear aesthetics and profound spiritual truth.",
+    title: "Apparel That Speaks",
+    desc: "Every garment is a tool for sharing faith, opening doors for conversations about Jesus wherever you go.",
   },
   {
     icon: Gift,
-    title: "Direct Impact",
-    desc: "A portion of every purchase is donated directly to supporting local community outreach and global evangelism.",
+    title: "Purpose in Every Piece",
+    desc: "We don't just sell apparel. We carry a message, wear a purpose, and proclaim a Kingdom with every product.",
   },
   {
     icon: Users,
-    title: "Community Focused",
-    desc: "Join a global family of believers bold enough to share their testimony through premium streetwear.",
+    title: "Pastoral Heart",
+    desc: "Born from a pastoral family shepherding the Church in Los Angeles, our calling extends beyond the pulpit into everyday life.",
   },
 ];
 
@@ -57,7 +57,7 @@ const WhyBaseSection = () => {
                 Why <span className="text-orange-600">Base</span>?
               </h2>
               <p className="text-sm text-zinc-500 leading-relaxed pt-2">
-                We believe clothing is more than just fabric—it's a canvas for your testimony. We create premium streetwear that makes sharing your faith natural, beautiful, and bold.
+                We are a pastoral family honored to serve the Lord by shepherding the Church of Los Angeles, California. God has entrusted us with the mission of helping build a strong Christian identity — encouraging people to live according to the values of the Gospel in every area of life.
               </p>
             </motion.div>
 
@@ -73,10 +73,10 @@ const WhyBaseSection = () => {
               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-orange-600/20 rounded-full blur-3xl group-hover:bg-orange-600/35 transition-colors duration-500" />
               
               <h4 className="text-sm font-bold uppercase tracking-widest text-orange-400 mb-2">
-                The Base Standard
+                Our Mission
               </h4>
               <p className="text-xs text-zinc-300 leading-relaxed mb-5">
-                Each product is designed, inspected, and shipped with care from our central workshop to ensure you receive nothing but the best.
+                To glorify God, serve people, and expand His Kingdom through everything He has entrusted into our hands.
               </p>
               <Link 
                 to="/shop" 
@@ -99,8 +99,8 @@ const WhyBaseSection = () => {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 p-3 sm:p-5 bg-white border border-zinc-100 rounded-xl hover:border-orange-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
               >
-                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-50 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
-                  <item.icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-600 group-hover:text-white transition-colors" />
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-50 flex items-center justify-center">
+                  <item.icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-600" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-[10px] sm:text-sm font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">

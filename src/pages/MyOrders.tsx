@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import FooterSection from "../components/FooterSection";
 import { motion } from "framer-motion";
-import { ShoppingBag, ChevronRight, Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { ShoppingBag, ChevronRight, Package, Truck, CheckCircle, Clock, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { BASE_URL, authHeaders } from "@/lib/utils";
@@ -13,6 +13,8 @@ interface OrderItem {
     price: number;
     quantity: number;
     size: string;
+    color?: string;
+    variantInfo?: string;
     image: string;
 }
 
@@ -20,6 +22,7 @@ interface Order {
     id: string;
     total: number;
     status: 'pending' | 'processing' | 'packed' | 'shipped' | 'delivered' | 'cancelled';
+    statusMessage?: string;
     paymentMethod: string;
     paymentStatus: string;
     createdAt: string;
@@ -122,7 +125,7 @@ const MyOrders = () => {
                                         <div className="flex items-center gap-6">
                                             <div>
                                                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Order ID</p>
-                                                <p className="text-[10px] font-mono font-black truncate max-w-[120px] uppercase">{order.id}</p>
+                                                <p className="text-[10px] font-mono font-black truncate max-w-[120px] uppercase">#{order.id.split('-')[0]}</p>
                                             </div>
                                             <div>
                                                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Date</p>
@@ -150,30 +153,64 @@ const MyOrders = () => {
                                         </div>
                                     </div>
 
+                                    {/* Status Message */}
+                                    {order.statusMessage && (
+                                        <div className="px-5 py-3 bg-primary/5 border-b border-border/40 flex items-start gap-3">
+                                            <MessageSquare size={14} className="text-primary mt-0.5 shrink-0" />
+                                            <div>
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-0.5">Admin Update</p>
+                                                <p className="text-xs text-zinc-700 font-medium italic leading-relaxed">{order.statusMessage}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Order Items */}
                                     <div className="p-5">
                                         <div className="space-y-4">
-                                            {order.items.map((item) => (
-                                                <div key={item.id} className="flex items-center gap-4">
-                                                    <div className="w-16 h-20 rounded bg-muted overflow-hidden border border-border/40 shrink-0">
-                                                        <img 
-                                                            src={item.image || "/placeholder.jpg"} 
-                                                            alt={item.name} 
-                                                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                                        <div>
-                                                            <h3 className="text-xs font-black uppercase tracking-tight mb-1">{item.name}</h3>
-                                                            <div className="flex items-center gap-3">
-                                                                <span className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase">Size: {item.size}</span>
-                                                                <span className="text-[9px] font-bold text-muted-foreground">Qty: {item.quantity}</span>
-                                                            </div>
+                                            {order.items.map((item) => {
+                                                let customFieldsData: Record<string, string> = {};
+                                                try {
+                                                    customFieldsData = item.variantInfo ? JSON.parse(item.variantInfo) : {};
+                                                } catch (e) {
+                                                    // ignore parse errors
+                                                }
+
+                                                return (
+                                                    <div key={item.id} className="flex items-center gap-4">
+                                                        <div className="w-16 h-20 rounded bg-muted overflow-hidden border border-border/40 shrink-0">
+                                                            <img 
+                                                                src={item.image || "/placeholder.jpg"} 
+                                                                alt={item.name} 
+                                                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                            />
                                                         </div>
-                                                        <p className="text-xs font-black">${item.price * item.quantity}</p>
+                                                        <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                            <div>
+                                                                <h3 className="text-xs font-black uppercase tracking-tight mb-1">{item.name}</h3>
+                                                                <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                                                                    <span className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                                                        <span className="opacity-60">SIZE:</span> {item.size}
+                                                                    </span>
+                                                                    {item.color && (
+                                                                        <span className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                                                            <span className="opacity-60">COLOR:</span> {item.color}
+                                                                        </span>
+                                                                    )}
+                                                                    {Object.entries(customFieldsData).map(([key, value]) => (
+                                                                        <span key={key} className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                                                            <span className="opacity-60">{key}:</span> {value}
+                                                                        </span>
+                                                                    ))}
+                                                                    <span className="text-[9px] font-black text-primary bg-primary/10 px-1.5 py-0.5 rounded uppercase">
+                                                                        QTY: {item.quantity}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <p className="text-xs font-black">${item.price * item.quantity}</p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </motion.div>

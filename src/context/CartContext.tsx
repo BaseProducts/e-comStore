@@ -14,13 +14,15 @@ export interface CartItem {
   id: string;
   productId: string;
   size: string;
+  color: string;
+  variantInfo: string;
   quantity: number;
   product: Product;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (productId: string, size: string, quantity?: number) => Promise<void>;
+  addToCart: (productId: string, size: string, color?: string, variantInfo?: Record<string, string>, quantity?: number) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
   refreshCart: () => Promise<void>;
@@ -74,7 +76,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     refreshCart();
   }, []);
 
-  const addToCart = async (productId: string, size: string, quantity: number = 1) => {
+  const addToCart = async (
+    productId: string,
+    size: string,
+    color: string = '',
+    variantInfo: Record<string, string> = {},
+    quantity: number = 1
+  ) => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Please login to add items to cart');
@@ -88,7 +96,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
           ...authHeaders(),
         },
-        body: JSON.stringify({ productId, size, quantity }),
+        body: JSON.stringify({
+          productId,
+          size,
+          color,
+          variantInfo: JSON.stringify(variantInfo),
+          quantity,
+        }),
       });
 
       if (res.ok) {

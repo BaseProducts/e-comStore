@@ -9,6 +9,14 @@ import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
 import { BASE_URL } from "@/lib/utils";
 
+interface CustomField {
+    id: string;
+    name: string;
+    type: 'text' | 'color';
+    values: string[];
+    colorCodes?: string[];
+}
+
 interface Product {
     id: string;
     name: string;
@@ -21,6 +29,7 @@ interface Product {
     isVisible: boolean;
     stock: number;
     sizes: string[];
+    customFields?: CustomField[];
 }
 
 const ProductDetails = () => {
@@ -32,6 +41,8 @@ const ProductDetails = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [selectedSize, setSelectedSize] = useState<string>("");
+    const [selectedColor, setSelectedColor] = useState<string>("");
+    const [customSelections, setCustomSelections] = useState<Record<string, string>>({});
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -50,6 +61,21 @@ const ProductDetails = () => {
                     if (data.sizes && data.sizes.length > 0) {
                         setSelectedSize(data.sizes[0]);
                     }
+
+                    // Preselect first color if available
+                    const colorField = data.customFields?.find((f: CustomField) => f.type === 'color');
+                    if (colorField && colorField.values.length > 0) {
+                        setSelectedColor(colorField.values[0]);
+                    }
+
+                    // Preselect first value for each text custom field
+                    const initialSelections: Record<string, string> = {};
+                    data.customFields?.forEach((f: CustomField) => {
+                        if (f.type === 'text' && f.values.length > 0) {
+                            initialSelections[f.name] = f.values[0];
+                        }
+                    });
+                    setCustomSelections(initialSelections);
                 } else {
                     toast.error("Product not found");
                 }
@@ -78,9 +104,21 @@ const ProductDetails = () => {
             toast.error("Please select a size first");
             return;
         }
+
+        // Check color selection
+        const colorField = product?.customFields?.find(f => f.type === 'color');
+        if (colorField && colorField.values.length > 0 && !selectedColor) {
+            toast.error("Please select a color");
+            return;
+        }
         
         if (product) {
-            await addToCart(product.id, selectedSize || "One Size");
+            await addToCart(
+                product.id,
+                selectedSize || "One Size",
+                selectedColor,
+                customSelections
+            );
         }
     };
 
@@ -96,9 +134,20 @@ const ProductDetails = () => {
             toast.error("Please select a size first");
             return;
         }
+
+        const colorField = product?.customFields?.find(f => f.type === 'color');
+        if (colorField && colorField.values.length > 0 && !selectedColor) {
+            toast.error("Please select a color");
+            return;
+        }
         
         if (product) {
-            await addToCart(product.id, selectedSize || "One Size");
+            await addToCart(
+                product.id,
+                selectedSize || "One Size",
+                selectedColor,
+                customSelections
+            );
             navigate("/checkout");
         }
     };
@@ -130,6 +179,8 @@ const ProductDetails = () => {
     }
 
     const availableImages = product.imageUrls || [];
+    const colorField = product.customFields?.find(f => f.type === 'color');
+    const textFields = product.customFields?.filter(f => f.type === 'text' && f.values.length > 0) || [];
 
     return (
         <div className="min-h-screen bg-background font-sans selection:bg-primary/30">
@@ -267,6 +318,67 @@ const ProductDetails = () => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Color Selection */}
+                        {colorField && colorField.values.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-zinc-800 mb-3">
+                                    Select Color
+                                </h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {colorField.values.map((colorName, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setSelectedColor(colorName)}
+                                            disabled={product.stock === 0}
+                                            className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border-2 text-xs font-bold transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed ${
+                                                selectedColor === colorName
+                                                    ? "border-black bg-zinc-50 shadow-md shadow-black/5 scale-105"
+                                                    : "border-zinc-200 hover:border-zinc-400"
+                                            }`}
+                                        >
+                                            <span
+                                                className="w-5 h-5 rounded-full border-2 flex-shrink-0 shadow-inner"
+                                                style={{
+                                                    backgroundColor: colorField.colorCodes?.[i] || '#000',
+                                                    borderColor: selectedColor === colorName ? '#000' : '#d4d4d8',
+                                                }}
+                                            />
+                                            <span className="text-zinc-700">{colorName}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Custom Text Fields Selection */}
+                        {textFields.length > 0 && (
+                            <div className="space-y-5 mb-6">
+                                {textFields.map((field) => (
+                                    <div key={field.id}>
+                                        <h3 className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-zinc-800 mb-3">
+                                            {field.name || 'Options'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {field.values.map((val, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => setCustomSelections(prev => ({ ...prev, [field.name]: val }))}
+                                                    disabled={product.stock === 0}
+                                                    className={`h-11 px-4 rounded-xl border-2 font-bold text-xs transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed ${
+                                                        customSelections[field.name] === val
+                                                            ? "bg-black border-black text-white shadow-md shadow-black/10 scale-105"
+                                                            : "border-zinc-200 hover:border-zinc-800 text-zinc-700 hover:text-black"
+                                                    }`}
+                                                >
+                                                    {val}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {/* Status Message */}
                         <div className="mb-6">

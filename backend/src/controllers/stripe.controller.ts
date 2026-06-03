@@ -235,6 +235,8 @@ export const handleWebhook = async (req: Request, res: Response) => {
           price: item.product.discountPrice || item.product.price,
           quantity: item.quantity,
           size: item.size,
+          color: item.color || '',
+          variantInfo: item.variantInfo || '{}',
           image: item.product.imageUrls?.[0] || '',
         }));
 

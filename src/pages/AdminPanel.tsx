@@ -25,7 +25,10 @@ import {
     EyeOff,
     FileText,
     MessageSquare,
-    CheckCircle2
+    CheckCircle2,
+    Palette,
+    GripVertical,
+    Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,6 +36,14 @@ interface Category {
     id: string;
     name: string;
     description?: string;
+}
+
+interface CustomField {
+    id: string;
+    name: string;
+    type: 'text' | 'color';
+    values: string[];
+    colorCodes?: string[];
 }
 
 interface Product {
@@ -45,6 +56,7 @@ interface Product {
     gender: string;
     imageUrls: string[];
     sizes: string[];
+    customFields?: CustomField[];
     stock: number;
     isVisible: boolean;
     createdAt: string;
@@ -74,6 +86,8 @@ interface OrderItem {
     price: number;
     quantity: number;
     size: string;
+    color?: string;
+    variantInfo?: string;
     image: string;
 }
 
@@ -85,6 +99,7 @@ interface Order {
     address: string;
     total: number;
     status: string;
+    statusMessage?: string;
     createdAt: string;
     paymentMethod: string;
     paymentStatus: string;
@@ -127,15 +142,22 @@ const AdminPanel = () => {
     const [productGender, setProductGender] = useState("Unisex");
     const [productStock, setProductStock] = useState("");
     const [productSizes, setProductSizes] = useState<string[]>([]);
+    const [sizesInputText, setSizesInputText] = useState("");
     const [productImages, setProductImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const [customFields, setCustomFields] = useState<CustomField[]>([]);
+    const [productColors, setProductColors] = useState<{name: string, code: string}[]>([]);
+    const [fieldInputTexts, setFieldInputTexts] = useState<Record<string, string>>({});
+    const [orderMessages, setOrderMessages] = useState<Record<string, string>>({});
+
+    const SETTINGS_API = `${BASE_URL}/api/settings`;
+    const [siteSettings, setSiteSettings] = useState<Record<string, string>>({});
+    const [uploadingSetting, setUploadingSetting] = useState<string | null>(null);
 
     const CATEGORIES_API = `${BASE_URL}/api/categories`;
     const PRODUCTS_API = `${BASE_URL}/api/products`;
     const MESSAGES_API = `${BASE_URL}/api/contact`;
     const USERS_API = `${BASE_URL}/api/users`;
-
-    const AVAILABLE_SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL", "Free Size"];
 
     useEffect(() => {
         fetchCategories();
@@ -144,6 +166,7 @@ const AdminPanel = () => {
         fetchCustomers();
         fetchOrders();
         fetchStats();
+        fetchSettings();
     }, []);
 
     // Polling for real-time updates based on active tab
@@ -163,10 +186,33 @@ const AdminPanel = () => {
         };
     }, [activeTab]);
 
-    const toggleSize = (size: string) => {
-        setProductSizes(prev => 
-            prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
-        );
+    // Custom Fields Handlers
+    const addCustomField = () => {
+        const newField: CustomField = {
+            id: crypto.randomUUID(),
+            name: '',
+            type: 'text',
+            values: [],
+        };
+        setCustomFields(prev => [...prev, newField]);
+    };
+
+    const removeCustomField = (fieldId: string) => {
+        setCustomFields(prev => prev.filter(f => f.id !== fieldId));
+        setFieldInputTexts(prev => { const n = {...prev}; delete n[fieldId]; return n; });
+    };
+
+    const updateCustomFieldName = (fieldId: string, name: string) => {
+        setCustomFields(prev => prev.map(f => f.id === fieldId ? { ...f, name } : f));
+    };
+
+    const addColor = (colorCode: string, colorName: string) => {
+        if (!colorName.trim()) return;
+        setProductColors(prev => [...prev, { name: colorName.trim(), code: colorCode }]);
+    };
+
+    const removeColor = (index: number) => {
+        setProductColors(prev => prev.filter((_, i) => i !== index));
     };
 
     const fetchStats = async () => {
@@ -273,6 +319,24 @@ const AdminPanel = () => {
             formData.append("isFeatured", "false"); 
             formData.append("sizes", JSON.stringify(productSizes));
 
+            // Build merged customFields: colors (dedicated) + text fields
+            const mergedFields: CustomField[] = [];
+            if (productColors.length > 0) {
+                mergedFields.push({
+                    id: 'colors-field',
+                    name: 'Colors',
+                    type: 'color',
+                    values: productColors.map(c => c.name),
+                    colorCodes: productColors.map(c => c.code),
+                });
+            }
+            customFields.forEach(f => {
+                if (f.name.trim() && f.values.length > 0) {
+                    mergedFields.push(f);
+                }
+            });
+            formData.append("customFields", JSON.stringify(mergedFields));
+
             if (editingProduct) {
                 // For editing, we also send the existing image URLs we want to keep
                 formData.append("existingImages", JSON.stringify(imagePreviews.filter(url => !url.startsWith("blob:"))));
@@ -304,8 +368,12 @@ const AdminPanel = () => {
                 setProductGender("Unisex");
                 setProductStock("");
                 setProductSizes([]);
+                setSizesInputText("");
                 setProductImages([]);
                 setImagePreviews([]);
+                setCustomFields([]);
+                setProductColors([]);
+                setFieldInputTexts({});
                 setEditingProduct(null);
                 fetchProducts();
                 if (editingProduct) setActiveTab("listed-products");
@@ -331,6 +399,25 @@ const AdminPanel = () => {
         setProductGender(product.gender);
         setProductStock(product.stock > 0 ? "1" : "0");
         setProductSizes(product.sizes || []);
+        setSizesInputText((product.sizes || []).join(', '));
+
+        // Separate colors from text fields
+        const existingFields = product.customFields || [];
+        const colorField = existingFields.find(f => f.type === 'color');
+        if (colorField) {
+            setProductColors(colorField.values.map((name, i) => ({
+                name,
+                code: colorField.colorCodes?.[i] || '#000000'
+            })));
+        } else {
+            setProductColors([]);
+        }
+        const textFields = existingFields.filter(f => f.type !== 'color');
+        setCustomFields(textFields);
+        const texts: Record<string, string> = {};
+        textFields.forEach(f => { texts[f.id] = f.values.join(', '); });
+        setFieldInputTexts(texts);
+
         setProductImages([]);
         setImagePreviews(product.imageUrls || []);
         setActiveTab("add-products");
@@ -346,6 +433,10 @@ const AdminPanel = () => {
         setProductGender("Unisex");
         setProductStock("");
         setProductSizes([]);
+        setSizesInputText("");
+        setCustomFields([]);
+        setProductColors([]);
+        setFieldInputTexts({});
         setProductImages([]);
         setImagePreviews([]);
         setActiveTab("listed-products");
@@ -557,16 +648,80 @@ const AdminPanel = () => {
         }
     };
 
-
-    const handleUpdateOrderStatus = async (id: string, status: string) => {
+    const fetchSettings = async () => {
         try {
+            const res = await fetch(SETTINGS_API);
+            const data = await res.json();
+            if (data?.data) {
+                setSiteSettings(data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching settings:", error);
+        }
+    };
+
+    const handleSettingImageUpload = async (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingSetting(key);
+        try {
+            const formData = new FormData();
+            formData.append("image", file);
+            
+            const uploadRes = await fetch(`${SETTINGS_API}/upload`, {
+                method: "POST",
+                headers: { ...authHeaders() },
+                body: formData
+            });
+            const { url } = await uploadRes.json();
+            
+            if (url) {
+                // Update settings
+                const newSettings = { [key]: url };
+                const updateRes = await fetch(SETTINGS_API, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...authHeaders()
+                    },
+                    body: JSON.stringify({ settings: newSettings })
+                });
+                
+                if (updateRes.ok) {
+                    setSiteSettings(prev => ({ ...prev, [key]: url }));
+                    toast.success("Image updated successfully");
+                } else {
+                    toast.error("Failed to save image URL to settings");
+                }
+            } else {
+                toast.error("Image upload failed");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("An error occurred during upload");
+        } finally {
+            setUploadingSetting(null);
+            // Reset input
+            e.target.value = '';
+        }
+    };
+
+
+    const handleUpdateOrderStatus = async (id: string, status: string, customMessageOverride?: string) => {
+        try {
+            const finalMessage = customMessageOverride !== undefined ? customMessageOverride : (orderMessages[id] !== undefined ? orderMessages[id] : undefined);
+            
             const response = await fetch(`${BASE_URL}/api/orders/${id}/status`, {
                 method: "PATCH",
                 headers: { 
                     "Content-Type": "application/json",
                     ...authHeaders()
                 },
-                body: JSON.stringify({ status })
+                body: JSON.stringify({ 
+                    status, 
+                    ...(finalMessage !== undefined && finalMessage.trim() ? { statusMessage: finalMessage.trim() } : { statusMessage: "" }) 
+                })
             });
 
             if (response.ok) {
@@ -636,7 +791,8 @@ const AdminPanel = () => {
                         { id: "listed-products", label: "Listed Products", Icon: Package },
                         { id: "messages", label: "Messages", Icon: MessageSquare, section: "Management" },
                         { id: "customers", label: "Customers", Icon: Users },
-                        { id: "orders", label: "Orders", Icon: Package, section: "Storefront" }
+                        { id: "orders", label: "Orders", Icon: Package, section: "Storefront" },
+                        { id: "storefront", label: "Storefront Layout", Icon: ImageIcon }
                     ].map((item) => (
                         <div key={item.id}>
                             {item.section && (
@@ -1150,23 +1306,179 @@ const AdminPanel = () => {
                                                         <option value="0">Out of Stock</option>
                                                     </select>
                                                 </div>
-                                                <div className="space-y-3">
+                                                {/* Sizes — typed comma separated */}
+                                                <div className="space-y-2">
                                                     <label className="text-sm font-medium font-mono uppercase tracking-widest text-muted-foreground block">Available Sizes</label>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {AVAILABLE_SIZES.map(size => (
+                                                    <Input
+                                                        value={sizesInputText}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setSizesInputText(val);
+                                                            if (val.trim() === '') {
+                                                                setProductSizes([]);
+                                                            } else {
+                                                                setProductSizes(val.split(',').map(s => s.trim()).filter(Boolean));
+                                                            }
+                                                        }}
+                                                        placeholder="e.g. S, M, L, XL, XXL, Free Size"
+                                                    />
+                                                    {productSizes.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                                            {productSizes.map((size, i) => (
+                                                                <span key={i} className="px-2.5 py-1 rounded-md text-[10px] font-bold font-mono bg-primary/10 text-primary border border-primary/20">
+                                                                    {size}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Dedicated Colors Field */}
+                                                <div className="space-y-4 pt-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-sm font-medium font-mono uppercase tracking-widest text-muted-foreground">Available Colors</label>
+                                                    </div>
+                                                    
+                                                    <div className="border border-border rounded-xl p-4 space-y-3 bg-muted/20">
+                                                        <div className="flex items-end gap-3">
+                                                            <div className="space-y-1 flex-shrink-0">
+                                                                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Pick Color</span>
+                                                                <input
+                                                                    type="color"
+                                                                    id="main-color-picker"
+                                                                    defaultValue="#000000"
+                                                                    className="w-10 h-10 rounded-lg border border-border cursor-pointer block"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 space-y-1">
+                                                                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Color Name</span>
+                                                                <div className="flex gap-2">
+                                                                    <Input
+                                                                        id="main-color-name"
+                                                                        placeholder="e.g. Midnight Black"
+                                                                        className="h-10 text-sm"
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === 'Enter') {
+                                                                                e.preventDefault();
+                                                                                const picker = document.getElementById("main-color-picker") as HTMLInputElement;
+                                                                                const nameInput = e.target as HTMLInputElement;
+                                                                                addColor(picker.value, nameInput.value);
+                                                                                nameInput.value = '';
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        className="h-10 px-3"
+                                                                        onClick={() => {
+                                                                            const picker = document.getElementById("main-color-picker") as HTMLInputElement;
+                                                                            const nameInput = document.getElementById("main-color-name") as HTMLInputElement;
+                                                                            addColor(picker.value, nameInput.value);
+                                                                            nameInput.value = '';
+                                                                        }}
+                                                                    >
+                                                                        <Plus size={14} />
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {/* Added Colors List */}
+                                                        {productColors.length > 0 && (
+                                                            <div className="flex flex-wrap gap-2 pt-1">
+                                                                {productColors.map((color, i) => (
+                                                                    <div
+                                                                        key={i}
+                                                                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-background border border-border text-xs font-semibold group/color hover:border-red-200 transition-colors"
+                                                                    >
+                                                                        <span
+                                                                            className="w-4 h-4 rounded-full border border-zinc-300 flex-shrink-0 shadow-inner"
+                                                                            style={{ backgroundColor: color.code }}
+                                                                        />
+                                                                        <span>{color.name}</span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => removeColor(i)}
+                                                                            className="ml-0.5 text-muted-foreground hover:text-red-500 transition-colors"
+                                                                        >
+                                                                            <X size={12} />
+                                                                        </button>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Dynamic Custom Fields */}
+                                                <div className="space-y-4 pt-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <label className="text-sm font-medium font-mono uppercase tracking-widest text-muted-foreground">Additional Attributes</label>
+                                                    </div>
+
+                                                    {/* Existing Custom Fields */}
+                                                    {customFields.map((field) => (
+                                                        <div key={field.id} className="border border-border rounded-xl p-4 space-y-3 bg-muted/20 relative group">
                                                             <button
-                                                                key={size}
                                                                 type="button"
-                                                                onClick={() => toggleSize(size)}
-                                                                className={`px-3 py-1.5 rounded-md text-xs font-bold font-mono border transition-all ${
-                                                                    productSizes.includes(size)
-                                                                        ? "bg-primary text-primary-foreground border-primary shadow-sm scale-105"
-                                                                        : "bg-background text-muted-foreground border-border hover:border-primary/50"
-                                                                }`}
+                                                                onClick={() => removeCustomField(field.id)}
+                                                                className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-md transition-all opacity-0 group-hover:opacity-100"
                                                             >
-                                                                {size}
+                                                                <X size={14} />
                                                             </button>
-                                                        ))}
+
+                                                            {/* Field Name */}
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                                                    <GripVertical size={14} className="text-primary" />
+                                                                </div>
+                                                                <Input
+                                                                    value={field.name}
+                                                                    onChange={(e) => updateCustomFieldName(field.id, e.target.value)}
+                                                                    placeholder="Field name (e.g. Material, Style)"
+                                                                    className="h-9 text-sm font-bold"
+                                                                />
+                                                            </div>
+
+                                                            {/* Text-type field: comma separated input */}
+                                                            <div className="space-y-2">
+                                                                <Input
+                                                                    value={fieldInputTexts[field.id] || ''}
+                                                                    onChange={(e) => {
+                                                                        const val = e.target.value;
+                                                                        setFieldInputTexts(prev => ({ ...prev, [field.id]: val }));
+                                                                        
+                                                                        const values = val.split(',').map(v => v.trim()).filter(Boolean);
+                                                                        setCustomFields(prev => prev.map(f => f.id === field.id ? { ...f, values } : f));
+                                                                    }}
+                                                                    placeholder="Enter comma-separated values (e.g. Cotton, Polyester, Linen)"
+                                                                    className="text-sm"
+                                                                />
+                                                                {field.values.length > 0 && (
+                                                                    <div className="flex flex-wrap gap-1.5">
+                                                                        {field.values.map((val, i) => (
+                                                                            <span key={i} className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-zinc-100 text-zinc-600 border border-zinc-200">
+                                                                                {val}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                    {/* Add Field Buttons */}
+                                                    <div className="flex gap-2 flex-wrap">
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="text-xs font-bold gap-1.5"
+                                                            onClick={addCustomField}
+                                                        >
+                                                            <Plus size={14} /> Add Custom Field
+                                                        </Button>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
@@ -1273,26 +1585,51 @@ const AdminPanel = () => {
                                                                 </div>
                                                                 {/* Order Items Summary */}
                                                                 <div className="mt-3 grid grid-cols-1 gap-2">
-                                                                    {order.items?.map((item, idx) => (
-                                                                        <div key={idx} className="flex items-center gap-3 p-1.5 bg-muted/40 rounded-sm border border-border/40 hover:bg-muted/60 transition-colors">
-                                                                            <div className="w-10 h-10 rounded bg-muted overflow-hidden flex-shrink-0 border border-border/20">
-                                                                                <img 
-                                                                                    src={item.image || "/placeholder.jpg"} 
-                                                                                    alt={item.name} 
-                                                                                    className="w-full h-full object-cover"
-                                                                                />
-                                                                            </div>
-                                                                            <div className="flex flex-col min-w-0">
-                                                                                <span className="text-[10px] font-black uppercase tracking-tight truncate max-w-[150px]">
-                                                                                    {item.name}
-                                                                                </span>
-                                                                                <div className="flex items-center gap-2 mt-0.5">
-                                                                                    <span className="text-[9px] font-mono text-muted-foreground bg-background px-1 rounded uppercase">SIZE: {item.size}</span>
-                                                                                    <span className="text-[9px] font-mono font-bold text-primary">QTY: {item.quantity}</span>
+                                                                    {order.items?.map((item, idx) => {
+                                                                        let customFieldsData: Record<string, string> = {};
+                                                                        try {
+                                                                            customFieldsData = item.variantInfo ? JSON.parse(item.variantInfo) : {};
+                                                                        } catch (e) {
+                                                                            // ignore parse errors
+                                                                        }
+
+                                                                        return (
+                                                                            <div key={idx} className="flex gap-3 p-2 bg-muted/40 rounded-md border border-border/40 hover:bg-muted/60 transition-colors">
+                                                                                <div className="w-12 h-12 rounded bg-muted overflow-hidden flex-shrink-0 border border-border/20">
+                                                                                    <img 
+                                                                                        src={item.image || "/placeholder.jpg"} 
+                                                                                        alt={item.name} 
+                                                                                        className="w-full h-full object-cover"
+                                                                                    />
+                                                                                </div>
+                                                                                <div className="flex flex-col min-w-0 flex-1">
+                                                                                    <div className="flex justify-between items-start">
+                                                                                        <span className="text-[10px] font-black uppercase tracking-tight line-clamp-1 pr-2">
+                                                                                            {item.name}
+                                                                                        </span>
+                                                                                        <span className="text-[10px] font-mono font-bold text-primary shrink-0">
+                                                                                            x{item.quantity}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                                                                        <span className="text-[9px] font-mono font-semibold text-muted-foreground bg-background border border-border/50 px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                                                                            <span className="opacity-50">SIZE:</span> {item.size}
+                                                                                        </span>
+                                                                                        {item.color && (
+                                                                                            <span className="text-[9px] font-mono font-semibold text-muted-foreground bg-background border border-border/50 px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                                                                                <span className="opacity-50">COLOR:</span> {item.color}
+                                                                                            </span>
+                                                                                        )}
+                                                                                        {Object.entries(customFieldsData).map(([key, value]) => (
+                                                                                            <span key={key} className="text-[9px] font-mono font-semibold text-muted-foreground bg-background border border-border/50 px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
+                                                                                                <span className="opacity-50">{key}:</span> {value}
+                                                                                            </span>
+                                                                                        ))}
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                    ))}
+                                                                        );
+                                                                    })}
                                                                 </div>
                                                             </td>
                                                             <td className="p-4 align-top">
@@ -1315,22 +1652,44 @@ const AdminPanel = () => {
                                                             </div>
                                                             </td>
                                                             <td className="p-4 align-top">
-                                                                <select 
-                                                                    value={order.status}
-                                                                    onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                                                                    className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1.5 rounded border transition-all outline-none ${
-                                                                        order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
-                                                                        order.status === 'cancelled' ? 'bg-red-50 text-red-600 border-red-200' :
-                                                                        'bg-blue-50 text-blue-600 border-blue-200'
-                                                                    }`}
-                                                                >
-                                                                    <option value="pending">Pending</option>
-                                                                    <option value="processing">Processing</option>
-                                                                    <option value="packed">Packed</option>
-                                                                    <option value="shipped">Shipped</option>
-                                                                    <option value="delivered">Delivered</option>
-                                                                    <option value="cancelled">Cancelled</option>
-                                                                </select>
+                                                                <div className="flex flex-col gap-2 items-start">
+                                                                    <div className="flex flex-col gap-1.5 w-full max-w-[160px]">
+                                                                        <select 
+                                                                            value={order.status}
+                                                                            onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                                                            className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1.5 rounded border transition-all outline-none ${
+                                                                                order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 
+                                                                                order.status === 'cancelled' ? 'bg-red-50 text-red-600 border-red-200' :
+                                                                                'bg-blue-50 text-blue-600 border-blue-200'
+                                                                            }`}
+                                                                        >
+                                                                            <option value="pending">Pending</option>
+                                                                            <option value="processing">Processing</option>
+                                                                            <option value="packed">Packed</option>
+                                                                            <option value="shipped">Shipped</option>
+                                                                            <option value="delivered">Delivered</option>
+                                                                            <option value="cancelled">Cancelled</option>
+                                                                        </select>
+                                                                        
+                                                                        <div className="flex flex-col gap-1">
+                                                                            <input 
+                                                                                type="text"
+                                                                                placeholder="Custom message..."
+                                                                                value={orderMessages[order.id] !== undefined ? orderMessages[order.id] : (order.statusMessage || "")}
+                                                                                onChange={(e) => setOrderMessages(prev => ({ ...prev, [order.id]: e.target.value }))}
+                                                                                className="text-[9px] px-2 py-1.5 rounded border border-border/50 bg-background w-full outline-none focus:border-primary/50"
+                                                                            />
+                                                                            {(orderMessages[order.id] !== undefined && orderMessages[order.id] !== (order.statusMessage || "")) && (
+                                                                                <button 
+                                                                                    onClick={() => handleUpdateOrderStatus(order.id, order.status, orderMessages[order.id])}
+                                                                                    className="bg-primary text-primary-foreground text-[9px] py-1 px-2 rounded font-bold hover:opacity-90 transition-all self-end"
+                                                                                >
+                                                                                    Save Message
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </td>
                                                             <td className="p-4 text-right align-top">
                                                                 <Button 
@@ -1347,6 +1706,63 @@ const AdminPanel = () => {
                                                 )}
                                             </tbody>
                                         </table>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="storefront" className="space-y-6 mt-0">
+                            <Card className="shadow-md border-primary/5">
+                                <CardHeader>
+                                    <CardTitle>Storefront Images</CardTitle>
+                                    <CardDescription>Manage the hero slideshow banners and purpose poster image.</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {[
+                                            { key: 'banner_image_1', label: 'Slideshow Banner 1', rec: '1920x1080px' },
+                                            { key: 'banner_image_2', label: 'Slideshow Banner 2', rec: '1920x1080px' },
+                                            { key: 'banner_image_3', label: 'Slideshow Banner 3', rec: '1920x1080px' },
+                                            { key: 'purpose_image', label: 'Our Purpose Poster', rec: '800x1200px' }
+                                        ].map((setting) => (
+                                            <div key={setting.key} className="border border-border/60 p-4 rounded-md bg-muted/10 space-y-4">
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="font-black text-sm uppercase tracking-tighter">{setting.label}</h3>
+                                                    {uploadingSetting === setting.key && (
+                                                        <span className="text-[10px] font-bold text-primary animate-pulse uppercase tracking-widest">Uploading...</span>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="aspect-video w-full bg-muted rounded-md border border-border/40 overflow-hidden relative group flex items-center justify-center">
+                                                    {siteSettings[setting.key] ? (
+                                                        <img 
+                                                            src={siteSettings[setting.key]} 
+                                                            alt={setting.label} 
+                                                            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                                                        />
+                                                    ) : (
+                                                        <div className="text-center text-muted-foreground opacity-50 p-4">
+                                                            <ImageIcon className="w-8 h-8 mx-auto mb-2" />
+                                                            <span className="text-xs font-bold uppercase tracking-widest">No Image Set</span>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <label className="cursor-pointer gradient-btn px-4 py-2 rounded-sm text-xs font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-transform text-white">
+                                                            Upload New Image
+                                                            <input 
+                                                                type="file" 
+                                                                className="hidden" 
+                                                                accept="image/*"
+                                                                onChange={(e) => handleSettingImageUpload(setting.key, e)}
+                                                                disabled={uploadingSetting === setting.key}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <p className="text-[10px] text-muted-foreground">Recommended size: {setting.rec}. Format: JPG, PNG, WEBP.</p>
+                                            </div>
+                                        ))}
                                     </div>
                                 </CardContent>
                             </Card>

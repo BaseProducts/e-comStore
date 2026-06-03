@@ -19,7 +19,7 @@ const FooterSection = () => {
               <span className="text-white font-black text-xl tracking-wider uppercase">Base</span>
             </div>
             <p className="text-xs text-zinc-500 leading-relaxed max-w-sm">
-              Faith-driven streetwear for those who wear their beliefs boldly. Premium quality materials crafted to spark conversation and share your testimony.
+              Founded in 2018 by a pastoral family from Los Angeles. We don't just sell apparel — we carry a message, wear a purpose, and proclaim the Kingdom of God.
             </p>
             {/* Social Icons */}
             <div className="flex items-center gap-3 pt-2">

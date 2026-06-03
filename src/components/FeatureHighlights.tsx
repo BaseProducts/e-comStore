@@ -19,8 +19,8 @@ const highlights = [
   },
   {
     icon: Heart,
-    title: "Fashion That Evangelizes",
-    subtitle: "Bold designs that spark conversations"
+    title: "Apparel With Purpose",
+    subtitle: "Wear a message, proclaim a Kingdom"
   }
 ];
 
