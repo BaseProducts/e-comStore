@@ -15,10 +15,14 @@ import userRoutes from './routes/user.routes.js';
 import cartRoutes from './routes/cart.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import orderRoutes from './routes/order.routes.js';
+import faqRoutes from './routes/faq.routes.js';
+import reviewRoutes from './routes/review.routes.js';
 import './models/CartItem.js';
 import './models/Setting.js';
 import './models/Order.js';
 import './models/OrderItem.js';
+import './models/Faq.js';
+import './models/Review.js';
 
 // Connect to Database
 connectDB();
@@ -105,6 +109,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/faqs', faqRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
