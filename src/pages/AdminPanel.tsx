@@ -28,9 +28,13 @@ import {
     CheckCircle2,
     Palette,
     GripVertical,
-    Image as ImageIcon
+    Image as ImageIcon,
+    HelpCircle,
+    Star
 } from "lucide-react";
 import { toast } from "sonner";
+import { AdminFaqs } from "@/components/admin/AdminFaqs";
+import { AdminReviews } from "@/components/admin/AdminReviews";
 
 interface Category {
     id: string;
@@ -754,7 +758,7 @@ const AdminPanel = () => {
 
 
     return (
-        <div className="flex min-h-screen bg-zinc-50 text-foreground font-sans">
+        <div className="flex min-h-screen bg-[#FAF9F7] text-foreground font-sans">
             {/* Mobile Sidebar Overlay */}
             {mobileMenuOpen && (
                 <div 
@@ -765,15 +769,15 @@ const AdminPanel = () => {
 
             {/* Sidebar - Desktop and Mobile Drawer */}
             <aside className={`
-                w-64 bg-background border-r border-border flex flex-col fixed md:sticky top-0 h-screen z-[70] transition-transform duration-300 ease-in-out
+                w-64 bg-white border-r border-[#E8E5E0] flex flex-col fixed md:sticky top-0 h-screen z-[70] transition-transform duration-300 ease-in-out
                 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}>
-                <div className="p-6 border-b border-border flex items-center justify-between">
+                <div className="p-6 border-b border-[#E8E5E0] flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
-                            <Store className="text-white w-5 h-5" />
+                        <div className="w-8 h-8 rounded bg-[#1A1A1A] flex items-center justify-center shrink-0">
+                            <Store className="text-white w-4 h-4" />
                         </div>
-                        <span className="font-black text-lg tracking-tighter uppercase italic">Base Admin</span>
+                        <span className="font-semibold text-[15px] text-[#1A1A1A]">Base Admin</span>
                     </div>
                     <button 
                         onClick={() => setMobileMenuOpen(false)}
@@ -792,7 +796,9 @@ const AdminPanel = () => {
                         { id: "messages", label: "Messages", Icon: MessageSquare, section: "Management" },
                         { id: "customers", label: "Customers", Icon: Users },
                         { id: "orders", label: "Orders", Icon: Package, section: "Storefront" },
-                        { id: "storefront", label: "Storefront Layout", Icon: ImageIcon }
+                        { id: "storefront", label: "Storefront Layout", Icon: ImageIcon },
+                        { id: "faqs", label: "FAQs", Icon: HelpCircle },
+                        { id: "reviews", label: "Reviews", Icon: Star }
                     ].map((item) => (
                         <div key={item.id}>
                             {item.section && (
@@ -803,7 +809,7 @@ const AdminPanel = () => {
                                     setActiveTab(item.id);
                                     setMobileMenuOpen(false);
                                 }}
-                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === item.id ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded text-[12px] font-medium transition-all ${activeTab === item.id ? "bg-[#1A1A1A] text-white" : "text-[#6B6B6B] hover:bg-[#F5F3F0] hover:text-[#1A1A1A]"}`}
                             >
                                 <item.Icon size={16} /> {item.label}
                             </button>
@@ -811,34 +817,31 @@ const AdminPanel = () => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t border-border mt-auto">
+                <div className="p-4 border-t border-[#E8E5E0] mt-auto">
                     <button 
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-3 py-3 rounded-sm text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 transition-all active:scale-95"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-[12px] font-medium text-red-500 hover:bg-red-50 transition-all"
                     >
-                        <LogOut size={16} /> Logout
+                        <LogOut size={16} /> Sign out
                     </button>
                 </div>
             </aside>
 
             {/* Main Content - Right Part */}
             <main className="flex-1 min-w-0 overflow-y-auto">
-                <header className="h-16 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-50 flex items-center justify-between px-6 md:px-8">
+                <header className="h-14 border-b border-[#E8E5E0] bg-white sticky top-0 z-50 flex items-center justify-between px-6 md:px-8">
                     <div className="flex items-center gap-4">
                         <button 
                             onClick={() => setMobileMenuOpen(true)}
-                            className="md:hidden p-2 text-foreground hover:bg-muted rounded-md transition-colors"
+                            className="md:hidden p-2 text-[#1A1A1A] hover:bg-[#F5F3F0] rounded transition-colors"
                         >
-                            <Menu size={22} />
+                            <Menu size={20} />
                         </button>
-                        <h2 className="font-black text-lg uppercase tracking-tighter italic">{activeTab.replace('-', ' ')}</h2>
+                        <h2 className="font-medium text-[15px] text-[#1A1A1A] capitalize">{activeTab.replace('-', ' ')}</h2>
                     </div>
-                    <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                        <span className="hidden sm:inline">Admin Session:</span>
-                        <div className="flex items-center gap-2 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
-                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span className="font-black text-emerald-500">Active</span>
-                        </div>
+                    <div className="flex items-center gap-2 text-[11px] text-[#8A8A8A]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                        <span>Active</span>
                     </div>
                 </header>
 
@@ -1246,7 +1249,11 @@ const AdminPanel = () => {
                                                             min="0"
                                                             step="0.01" 
                                                             value={productPrice}
-                                                            onChange={(e) => setProductPrice(e.target.value)}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                if (Number(val) < 0) return;
+                                                                setProductPrice(val);
+                                                            }}
                                                             placeholder="49.99" 
                                                             required 
                                                         />
@@ -1258,7 +1265,11 @@ const AdminPanel = () => {
                                                             min="0"
                                                             step="0.01" 
                                                             value={productDiscountPrice}
-                                                            onChange={(e) => setProductDiscountPrice(e.target.value)}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                if (Number(val) < 0) return;
+                                                                setProductDiscountPrice(val);
+                                                            }}
                                                             placeholder="39.99" 
                                                         />
                                                     </div>
@@ -1748,7 +1759,7 @@ const AdminPanel = () => {
                                                     )}
                                                     
                                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <label className="cursor-pointer gradient-btn px-4 py-2 rounded-sm text-xs font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-transform text-white">
+                                                        <label className="cursor-pointer bg-[#1A1A1A] hover:bg-[#333] px-4 py-2 text-xs font-medium text-white transition-colors">
                                                             Upload New Image
                                                             <input 
                                                                 type="file" 
@@ -1766,6 +1777,14 @@ const AdminPanel = () => {
                                     </div>
                                 </CardContent>
                             </Card>
+                        </TabsContent>
+
+                        <TabsContent value="faqs" className="space-y-6 mt-0">
+                            <AdminFaqs />
+                        </TabsContent>
+
+                        <TabsContent value="reviews" className="space-y-6 mt-0">
+                            <AdminReviews />
                         </TabsContent>
 
                     </Tabs>

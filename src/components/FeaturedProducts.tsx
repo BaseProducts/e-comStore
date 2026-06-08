@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ShoppingBag, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "@/lib/utils";
 
@@ -22,7 +21,6 @@ const PRODUCTS_API = `${BASE_URL}/api/products`;
 const FeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLatestProducts = async () => {
@@ -30,8 +28,6 @@ const FeaturedProducts = () => {
         const response = await fetch(PRODUCTS_API);
         if (response.ok) {
           const data = await response.json();
-          // Filter to visible only, and get the most recent 8
-          // The API retrieves by createdAt DESC so we just take first 8 visible
           const filtered = data.filter((p: Product) => p.isVisible);
           setProducts(filtered.slice(0, 8));
         }
@@ -44,74 +40,50 @@ const FeaturedProducts = () => {
     fetchLatestProducts();
   }, []);
 
-  useEffect(() => {
-    const handleDocumentClick = () => {
-      setActiveCardId(null);
-    };
-    document.addEventListener("click", handleDocumentClick);
-    return () => document.removeEventListener("click", handleDocumentClick);
-  }, []);
-
-  const handleCardClick = (e: React.MouseEvent, productId: string) => {
-    if (window.innerWidth < 768) {
-      if (activeCardId !== productId) {
-        e.preventDefault();
-        e.stopPropagation();
-        setActiveCardId(productId);
-      }
-    }
-  };
-
   return (
-    <section id="shop" className="py-12 md:py-20 px-4 md:px-6">
-      <div className="container mx-auto bg-zinc-200/90 border border-zinc-200/50 rounded-2xl p-8 md:p-12 lg:p-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-3">
-            New Arrivals
-          </p>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tight">
-            Featured
-          </h2>
-        </motion.div>
+    <section className="py-16 md:py-24 px-6 lg:px-8">
+      <div className="container mx-auto">
+        {/* Section header */}
+        <div className="flex items-end justify-between mb-10 md:mb-14">
+          <div>
+            <h2 className="text-[22px] md:text-[28px] font-medium text-[#1A1A1A] tracking-tight">
+              Latest drop
+            </h2>
+          </div>
+          <Link
+            to="/shop"
+            className="text-[12px] md:text-[13px] text-white bg-[#1A1A1A] hover:bg-[#333] transition-colors tracking-wide px-5 py-2.5"
+          >
+            View all
+          </Link>
+        </div>
 
         {isLoading ? (
-          <div className="flex justify-center p-20 opacity-50">
-            <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          <div className="flex justify-center py-20">
+            <div className="w-6 h-6 border-2 border-[#E8E5E0] border-t-[#1A1A1A] rounded-full animate-spin"></div>
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center text-muted-foreground uppercase tracking-widest text-sm flex flex-col items-center">
-            <Package className="w-10 h-10 mb-4 opacity-50" />
-            <p>No products featured yet.</p>
+          <div className="text-center py-20">
+            <Package className="w-8 h-8 text-[#D5D0CA] mx-auto mb-3" />
+            <p className="text-[13px] text-[#8A8A8A]">No products yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {products.map((product, i) => (
-              <motion.div
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-8 md:gap-y-12">
+            {products.map((product) => (
+              <Link
                 key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group cursor-pointer flex flex-col"
+                to={`/product/${product.id}`}
+                className="group flex flex-col"
               >
-                <Link 
-                  to={`/product/${product.id}`} 
-                  onClick={(e) => handleCardClick(e, product.id)}
-                  className="relative overflow-hidden rounded-sm bg-muted mb-4 aspect-[3/4] block"
-                >
+                {/* Product image */}
+                <div className="relative overflow-hidden bg-[#F0EDE8] mb-3 md:mb-4 aspect-[3/4]">
                   {product.stock === 0 && (
-                     <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-sm">
-                        Out of Stock
-                     </div>
+                    <div className="absolute top-2 left-2 z-10 bg-[#1A1A1A] text-white text-[10px] font-medium px-2 py-0.5 tracking-wide">
+                      Sold out
+                    </div>
                   )}
                   {product.stock > 0 && product.discountPrice && (
-                    <div className="absolute top-3 left-3 z-10 bg-emerald-500/90 text-white text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded shadow-sm backdrop-blur-sm">
+                    <div className="absolute top-2 left-2 z-10 bg-[#1A1A1A] text-white text-[10px] font-medium px-2 py-0.5 tracking-wide">
                       Sale
                     </div>
                   )}
@@ -120,53 +92,33 @@ const FeaturedProducts = () => {
                       src={product.imageUrls[0]}
                       alt={product.name}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground opacity-30">
-                      <Package className="w-12 h-12" />
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Package className="w-8 h-8 text-[#D5D0CA]" />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-500" />
-                  
-                  {/* Action on hover */}
-                  <span className={`absolute bottom-2 left-2 right-2 md:bottom-4 md:left-4 md:right-4 bg-black text-white py-2 md:py-3 px-1 md:px-4 rounded-sm text-[8px] min-[370px]:text-[10px] md:text-xs font-black tracking-[0.05em] min-[370px]:tracking-[0.15em] md:tracking-[0.2em] uppercase flex items-center justify-center gap-1 md:gap-2 transition-all duration-500 whitespace-nowrap ${
-                    activeCardId === product.id 
-                      ? "opacity-100 translate-y-0" 
-                      : "opacity-0 translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0"
-                  }`}>
-                    <ShoppingBag className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                    View Product
-                  </span>
-                </Link>
-                <div>
-                   <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mb-1.5">{product.category}</div>
-                   <h3 className="text-xs sm:text-sm font-black uppercase tracking-tight text-foreground mb-1 group-hover:underline decoration-border underline-offset-4 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
-                     <Link to={`/product/${product.id}`}>
-                       {product.name}
-                     </Link>
-                   </h3>
-                   <div className="flex items-center gap-2">
-                       <span className="text-sm font-medium">
-                         ${product.discountPrice || product.price}
-                       </span>
-                       {product.discountPrice && (
-                         <span className="text-[10px] text-muted-foreground line-through">
-                           ${product.price}
-                         </span>
-                       )}
-                   </div>
                 </div>
-              </motion.div>
+
+                {/* Product info */}
+                <div className="space-y-1">
+                  <h3 className="text-[12px] md:text-[13px] font-medium text-[#1A1A1A] line-clamp-1 group-hover:underline underline-offset-2 decoration-[#D5D0CA]">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[12px] md:text-[13px] text-[#1A1A1A]">
+                      ${product.discountPrice || product.price}
+                    </span>
+                    {product.discountPrice && (
+                      <span className="text-[11px] text-[#B5B5B5] line-through">
+                        ${product.price}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
             ))}
-          </div>
-        )}
-        
-        {!isLoading && products.length > 0 && (
-          <div className="text-center mt-12">
-            <Link to="/shop" className="inline-block bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white hover:border-orange-600 px-8 py-3 rounded-md text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-sm">
-               View All Products
-            </Link>
           </div>
         )}
       </div>

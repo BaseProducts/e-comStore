@@ -35,11 +35,7 @@ const BrandMessageSection = () => {
             transition={{ duration: 0.7 }}
             className="lg:col-span-5 relative"
           >
-            {/* Soft decorative background glow */}
-            <div className="absolute -left-8 -top-8 w-72 h-72 bg-orange-100/50 rounded-full blur-3xl -z-10" />
-            
-            {/* Main Image Container */}
-            <div className="relative overflow-hidden rounded-2xl border border-zinc-200/60 shadow-xl aspect-square max-w-[500px] mx-auto">
+            <div className="relative overflow-hidden border border-[#E8E5E0] bg-[#F0EDE8] aspect-square max-w-[500px] mx-auto">
               <img 
                 src={dynamicPoster}  
                 alt="Base Products — Founded on the Word" 
@@ -49,10 +45,10 @@ const BrandMessageSection = () => {
               
               {/* Bottom text overlay on image */}
               <div className="absolute bottom-6 left-6 text-white">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-orange-400">
+                <span className="text-[11px] font-medium tracking-wide uppercase text-white/70">
                   Est. 2018
                 </span>
-                <p className="text-sm font-semibold tracking-wide mt-1">
+                <p className="text-[14px] font-medium tracking-wide mt-1">
                   Founded on the Word. Guided by Faith.
                 </p>
               </div>
@@ -83,18 +79,18 @@ const BrandMessageSection = () => {
               transition={{ duration: 0.6 }}
               className="space-y-4"
             >
-              <span className="text-[11px] font-black uppercase tracking-[0.25em] text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+              <span className="text-[11px] font-medium tracking-wide text-[#8A8A8A] uppercase">
                 Our Purpose
               </span>
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-zinc-900 leading-tight">
+              <h2 className="text-[28px] md:text-[36px] font-medium text-[#1A1A1A] tracking-tight leading-tight">
                 More than apparel. <br />
-                <span className="text-orange-600">We carry a message.</span>
+                <span className="text-[#8A8A8A]">We carry a message.</span>
               </h2>
-              <p className="text-sm md:text-base text-zinc-500 leading-relaxed pt-2">
+              <p className="text-[13px] text-[#6B6B6B] leading-relaxed pt-2">
                 We believe that clothing is more than appearance. Every garment communicates a message, reflects values, and expresses an identity. That is why we have chosen to build a brand founded on the principles of God's Word, with Christ at the center of everything we do.
               </p>
-              <p className="text-sm md:text-base text-zinc-500 leading-relaxed">
-                Base Products exists so that every person who wears our brand carries a purpose — a tool for sharing faith, opening doors for conversations about Jesus, and reminding the world that we are called to live lives that glorify God.
+              <p className="text-[13px] text-[#6B6B6B] leading-relaxed">
+                Base exists so that every person who wears our brand carries a purpose — a tool for sharing faith, opening doors for conversations about Jesus, and reminding the world that we are called to live lives that glorify God.
               </p>
             </motion.div>
 

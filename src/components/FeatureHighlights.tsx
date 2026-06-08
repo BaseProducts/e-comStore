@@ -1,55 +1,22 @@
-import { ShieldCheck, Truck, Sparkles, Heart } from "lucide-react";
-import { motion } from "framer-motion";
-
 const highlights = [
-  {
-    icon: ShieldCheck,
-    title: "100% Secure Store",
-    subtitle: "Secure payment & SSL encrypted checkout"
-  },
-  {
-    icon: Truck,
-    title: "Fast Shipping",
-    subtitle: "Dispatched within 24-48 hours"
-  },
-  {
-    icon: Sparkles,
-    title: "Premium Fabrics",
-    subtitle: "Heavyweight cotton & durable designs"
-  },
-  {
-    icon: Heart,
-    title: "Apparel With Purpose",
-    subtitle: "Wear a message, proclaim a Kingdom"
-  }
+  { text: "Free shipping over $100" },
+  { text: "Premium quality fabrics" },
+  { text: "Secure checkout" },
+  { text: "Easy returns" },
 ];
 
 const FeatureHighlights = () => {
   return (
-    <section className="bg-card/45 py-5 sm:py-8 px-4 sm:px-6">
+    <section className="py-5 md:py-6 px-6 border-b border-[#E8E5E0]">
       <div className="container mx-auto">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-          {highlights.map((item, index) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-4 group"
+        <div className="grid grid-cols-2 md:flex md:flex-row md:items-center justify-center place-items-center gap-y-4 gap-x-2 md:gap-12">
+          {highlights.map((item) => (
+            <span
+              key={item.text}
+              className="text-[11px] md:text-[12px] text-[#8A8A8A] tracking-wide text-center"
             >
-              <div className="flex-shrink-0 w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <item.icon className="text-primary w-4.5 h-4.5 sm:w-6 sm:h-6" />
-              </div>
-              <div>
-                <h4 className="text-[10px] sm:text-sm font-black uppercase tracking-wider text-foreground mb-0.5 sm:mb-1">
-                  {item.title}
-                </h4>
-                <p className="text-[9px] sm:text-xs text-muted-foreground font-semibold leading-tight">
-                  {item.subtitle}
-                </p>
-              </div>
-            </motion.div>
+              {item.text}
+            </span>
           ))}
         </div>
       </div>

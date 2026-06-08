@@ -21,6 +21,8 @@ import { CartProvider } from "./context/CartContext.tsx";
 import ShippingReturns from "./pages/ShippingReturns.tsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import TermsOfService from "./pages/TermsOfService.tsx";
+import FAQ from "./pages/FAQ.tsx";
+import Reviews from "./pages/Reviews.tsx";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,8 @@ const App = () => (
             <Route path="/shipping-returns" element={<ShippingReturns />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/reviews" element={<Reviews />} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route element={<UserProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />

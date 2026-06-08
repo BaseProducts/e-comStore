@@ -10,13 +10,13 @@ const TermsOfService = () => {
       {/* Header */}
       <section className="bg-zinc-50 border-b border-border py-12 md:py-16 px-4 sm:px-6">
         <div className="container mx-auto max-w-4xl text-center space-y-4">
-          <span className="text-[11px] font-black uppercase tracking-[0.25em] text-orange-600 bg-orange-50 px-3 py-1 rounded-full inline-block">
+          <span className="text-[11px] font-medium tracking-wide text-[#8A8A8A] uppercase">
             Legal
           </span>
-          <h1 className="text-xl sm:text-2xl md:text-4xl font-black uppercase tracking-tight text-zinc-900">
+          <h1 className="text-[28px] md:text-[36px] font-medium tracking-tight text-[#1A1A1A]">
             Terms of Service
           </h1>
-          <p className="text-[10px] sm:text-xs text-zinc-400 tracking-wider">
+          <p className="text-[13px] text-[#8A8A8A] max-w-md mx-auto">
             Last Updated: May 25, 2026
           </p>
         </div>
@@ -29,37 +29,37 @@ const TermsOfService = () => {
             
             {/* Left Column - Quick Links (Sticky on Desktop) */}
             <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-4 hidden lg:block">
-              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900 pb-2 border-b border-zinc-200">
+              <h3 className="text-[13px] font-medium text-[#1A1A1A] pb-3 border-b border-[#E8E5E0]">
                 Table of Contents
               </h3>
-              <ul className="space-y-3 text-xs font-bold text-zinc-500">
+              <ul className="space-y-3 text-[13px] text-[#8A8A8A]">
                 <li>
-                  <a href="#agreement" className="hover:text-orange-600 transition-colors block py-1">
+                  <a href="#agreement" className="hover:text-[#1A1A1A] transition-colors block py-1">
                     1. Agreement to Terms
                   </a>
                 </li>
                 <li>
-                  <a href="#purchases" className="hover:text-orange-600 transition-colors block py-1">
+                  <a href="#purchases" className="hover:text-[#1A1A1A] transition-colors block py-1">
                     2. Purchases & Payments
                   </a>
                 </li>
                 <li>
-                  <a href="#intellectual-property" className="hover:text-orange-600 transition-colors block py-1">
+                  <a href="#intellectual-property" className="hover:text-[#1A1A1A] transition-colors block py-1">
                     3. Intellectual Property
                   </a>
                 </li>
                 <li>
-                  <a href="#conduct" className="hover:text-orange-600 transition-colors block py-1">
+                  <a href="#conduct" className="hover:text-[#1A1A1A] transition-colors block py-1">
                     4. User Conduct
                   </a>
                 </li>
                 <li>
-                  <a href="#liability" className="hover:text-orange-600 transition-colors block py-1">
+                  <a href="#liability" className="hover:text-[#1A1A1A] transition-colors block py-1">
                     5. Limitation of Liability
                   </a>
                 </li>
                 <li>
-                  <a href="#governing-law" className="hover:text-orange-600 transition-colors block py-1">
+                  <a href="#governing-law" className="hover:text-[#1A1A1A] transition-colors block py-1">
                     6. Governing Law
                   </a>
                 </li>
@@ -67,7 +67,7 @@ const TermsOfService = () => {
             </div>
 
             {/* Right Column - Terms Text */}
-            <div className="lg:col-span-8 space-y-12 text-xs sm:text-sm text-zinc-650 leading-relaxed font-normal">
+            <div className="lg:col-span-8 space-y-12 text-[14px] text-[#4A4A4A] leading-relaxed">
               
               <motion.div
                 id="agreement"
@@ -76,7 +76,7 @@ const TermsOfService = () => {
                 viewport={{ once: true }}
                 className="space-y-4 scrolling-section"
               >
-                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-zinc-900">
+                <h2 className="text-[15px] font-medium text-[#1A1A1A]">
                   1. Agreement to Terms
                 </h2>
                 <p>
@@ -91,7 +91,7 @@ const TermsOfService = () => {
                 viewport={{ once: true }}
                 className="space-y-4 scrolling-section"
               >
-                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-zinc-900">
+                <h2 className="text-[15px] font-medium text-[#1A1A1A]">
                   2. Purchases & Payments
                 </h2>
                 <p>
@@ -111,7 +111,7 @@ const TermsOfService = () => {
                 viewport={{ once: true }}
                 className="space-y-4 scrolling-section"
               >
-                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-zinc-900">
+                <h2 className="text-[15px] font-medium text-[#1A1A1A]">
                   3. Intellectual Property
                 </h2>
                 <p>
@@ -126,7 +126,7 @@ const TermsOfService = () => {
                 viewport={{ once: true }}
                 className="space-y-4 scrolling-section"
               >
-                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-zinc-900">
+                <h2 className="text-[15px] font-medium text-[#1A1A1A]">
                   4. User Conduct
                 </h2>
                 <p>
@@ -146,7 +146,7 @@ const TermsOfService = () => {
                 viewport={{ once: true }}
                 className="space-y-4 scrolling-section"
               >
-                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-zinc-900">
+                <h2 className="text-[15px] font-medium text-[#1A1A1A]">
                   5. Limitation of Liability
                 </h2>
                 <p>
@@ -161,13 +161,13 @@ const TermsOfService = () => {
                 viewport={{ once: true }}
                 className="space-y-4 scrolling-section"
               >
-                <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-zinc-900">
+                <h2 className="text-[15px] font-medium text-[#1A1A1A]">
                   6. Governing Law
                 </h2>
                 <p>
                   These Terms of Service shall be governed by and construed in accordance with the laws of the State of California, United States, without regard to its conflict of law provisions.
                 </p>
-                <p className="border-l-4 border-orange-500 pl-4 py-2 bg-zinc-50 rounded-r-xl font-medium text-zinc-900">
+                <p className="border-l-2 border-[#1A1A1A] pl-4 py-2 mt-4 text-[#1A1A1A]">
                   For support inquiries regarding terms, contact: basecustomer2018@gmail.com
                 </p>
               </motion.div>

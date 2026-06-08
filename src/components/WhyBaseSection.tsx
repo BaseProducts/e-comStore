@@ -50,13 +50,13 @@ const WhyBaseSection = () => {
               transition={{ duration: 0.6 }}
               className="space-y-4"
             >
-              <span className="text-[11px] font-black uppercase tracking-[0.25em] text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+              <span className="text-[11px] font-medium tracking-wide text-[#8A8A8A] uppercase">
                 Our Foundation
               </span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tight text-zinc-900 leading-none">
-                Why <span className="text-orange-600">Base</span>?
+              <h2 className="text-[28px] md:text-[36px] font-medium text-[#1A1A1A] tracking-tight leading-tight">
+                Why Base?
               </h2>
-              <p className="text-sm text-zinc-500 leading-relaxed pt-2">
+              <p className="text-[13px] text-[#6B6B6B] leading-relaxed pt-2">
                 We are a pastoral family honored to serve the Lord by shepherding the Church of Los Angeles, California. God has entrusted us with the mission of helping build a strong Christian identity — encouraging people to live according to the values of the Gospel in every area of life.
               </p>
             </motion.div>
@@ -67,46 +67,45 @@ const WhyBaseSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-zinc-900 text-white rounded-2xl p-6 relative overflow-hidden shadow-lg group"
+              className="bg-[#1A1A1A] text-white p-6 md:p-8 relative overflow-hidden group"
             >
-              {/* Background gradient glow */}
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-orange-600/20 rounded-full blur-3xl group-hover:bg-orange-600/35 transition-colors duration-500" />
-              
-              <h4 className="text-sm font-bold uppercase tracking-widest text-orange-400 mb-2">
+              <h4 className="text-[11px] font-medium tracking-widest text-[#D5D0CA] uppercase mb-2">
                 Our Mission
               </h4>
-              <p className="text-xs text-zinc-300 leading-relaxed mb-5">
+              <p className="text-[13px] text-[#E8E5E0] leading-relaxed mb-6">
                 To glorify God, serve people, and expand His Kingdom through everything He has entrusted into our hands.
               </p>
               <Link 
                 to="/shop" 
-                className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-white hover:text-orange-400 transition-colors"
+                className="inline-flex items-center gap-2 text-[12px] font-medium tracking-wide text-white transition-colors hover:text-[#D5D0CA]"
               >
-                Explore The Collection
+                Explore the collection
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
           </div>
 
           {/* Right Column - 6 Points Grid */}
-          <div className="lg:col-span-8 grid grid-cols-2 gap-3 sm:gap-6 md:gap-8">
+          <div className="lg:col-span-8 grid grid-cols-2 gap-3 md:gap-4">
             {pillars.map((item, i) => (
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 p-3 sm:p-5 bg-white border border-zinc-100 rounded-xl hover:border-orange-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
+                className="flex flex-col sm:flex-row gap-2 sm:gap-4 p-3 md:p-6 bg-white border border-[#E8E5E0] hover:border-[#1A1A1A] transition-all duration-300"
               >
-                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-50 flex items-center justify-center">
-                  <item.icon className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-orange-600" />
+                {/* Icon */}
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-sm bg-[#FAF9F7] border border-[#E8E5E0] flex items-center justify-center flex-shrink-0">
+                  <item.icon className="w-4 h-4 md:w-[18px] md:h-[18px] text-[#1A1A1A]" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-[10px] sm:text-sm font-black text-zinc-800 group-hover:text-zinc-950 transition-colors">
+                
+                {/* Content */}
+                <div className="space-y-1 md:space-y-1.5">
+                  <h3 className="text-[11px] md:text-[14px] font-medium text-[#1A1A1A] leading-tight">
                     {item.title}
                   </h3>
-                  <p className="text-[9px] sm:text-xs text-zinc-500 leading-normal sm:leading-relaxed font-semibold">
+                  <p className="text-[10px] md:text-[12px] text-[#6B6B6B] leading-relaxed">
                     {item.desc}
                   </p>
                 </div>

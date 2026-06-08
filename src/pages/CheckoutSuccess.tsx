@@ -146,34 +146,34 @@ const CheckoutSuccess = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
           >
-            <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto">
-              <AlertTriangle size={40} className="text-amber-500" />
+            <div className="w-16 h-16 bg-[#FAF9F7] border border-[#E8E5E0] flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle size={24} className="text-[#8A8A8A]" />
             </div>
-            <h1 className="text-3xl font-black uppercase tracking-tighter">
-              Payment <span className="text-amber-500">Processing</span>
+            <h1 className="text-[28px] font-medium tracking-tight text-[#1A1A1A]">
+              Payment <span className="text-[#8A8A8A]">Processing</span>
             </h1>
-            <p className="text-muted-foreground max-w-md mx-auto text-sm leading-relaxed">
+            <p className="text-[#6B6B6B] max-w-md mx-auto text-[14px] leading-relaxed">
               Your payment was received but order confirmation is taking longer than expected. 
               Don't worry — your order will appear in{" "}
-              <Link to="/orders" className="text-primary underline font-bold">My Orders</Link>{" "}
+              <Link to="/orders" className="text-[#1A1A1A] underline font-medium">My Orders</Link>{" "}
               once it's fully processed.
             </p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            <p className="text-[12px] text-[#8A8A8A]">
               No duplicate charges will occur
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
               <Link
                 to="/orders"
-                className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3.5 text-[13px] font-medium hover:bg-[#333] transition-colors"
               >
-                <Package size={16} />
-                Check My Orders
+                <Package size={14} />
+                Check my orders
               </Link>
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 border border-border px-8 py-4 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-muted transition-all"
+                className="inline-flex items-center gap-2 border border-[#E8E5E0] px-6 py-3.5 text-[13px] font-medium hover:bg-[#FAF9F7] transition-colors text-[#1A1A1A]"
               >
-                Back to Home
+                Back to home
               </Link>
             </div>
           </motion.div>
@@ -197,9 +197,9 @@ const CheckoutSuccess = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-            className="w-24 h-24 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto"
+            className="w-16 h-16 bg-[#FAF9F7] border border-[#E8E5E0] flex items-center justify-center mx-auto mb-6"
           >
-            <CheckCircle2 size={48} className="text-emerald-500" />
+            <CheckCircle2 size={24} className="text-emerald-500" />
           </motion.div>
 
           <div>
@@ -207,15 +207,15 @@ const CheckoutSuccess = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-4xl font-black uppercase tracking-tighter mb-3"
+              className="text-[28px] font-medium tracking-tight text-[#1A1A1A] mb-3"
             >
-              Payment <span className="text-emerald-500">Confirmed!</span>
+              Payment Confirmed
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-muted-foreground max-w-md mx-auto text-sm leading-relaxed"
+              className="text-[#6B6B6B] max-w-md mx-auto text-[14px] leading-relaxed"
             >
               Your payment has been successfully processed. Your order is now being prepared.
             </motion.p>
@@ -227,21 +227,21 @@ const CheckoutSuccess = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="bg-muted/20 border border-border rounded-sm p-6 text-left space-y-4"
+              className="bg-white border border-[#E8E5E0] p-6 text-left space-y-4"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                <span className="text-[11px] text-[#8A8A8A]">
                   Order ID
                 </span>
-                <span className="text-[10px] font-mono font-black uppercase">
+                <span className="text-[13px] font-medium text-[#1A1A1A]">
                   #{order.id.split("-")[0]}
                 </span>
               </div>
 
-              <div className="space-y-3 border-t border-border pt-4">
+              <div className="space-y-3 border-t border-[#E8E5E0] pt-4">
                 {order.items?.map((item) => (
-                  <div key={item.id} className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded bg-muted overflow-hidden flex-shrink-0">
+                  <div key={item.id} className="flex items-center gap-4">
+                    <div className="w-12 h-16 bg-[#F0EDE8] overflow-hidden flex-shrink-0 border border-[#E8E5E0]">
                       <img
                         src={item.image || "/placeholder.jpg"}
                         alt={item.name}
@@ -249,28 +249,28 @@ const CheckoutSuccess = () => {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-black uppercase tracking-tight truncate">
+                      <p className="text-[13px] font-medium text-[#1A1A1A] truncate mb-1">
                         {item.name}
                       </p>
-                      <p className="text-[9px] text-muted-foreground font-mono">
+                      <p className="text-[11px] text-[#8A8A8A]">
                         Qty: {item.quantity} • Size: {item.size}
                       </p>
                     </div>
-                    <span className="text-[10px] font-bold">
+                    <span className="text-[13px] font-medium text-[#1A1A1A]">
                       ${item.price * item.quantity}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-dashed border-border">
-                <span className="text-xs font-black uppercase tracking-tighter">Total Paid</span>
-                <span className="text-lg font-black text-emerald-500">${order.total}</span>
+              <div className="flex items-center justify-between pt-4 border-t border-[#E8E5E0]">
+                <span className="text-[13px] font-medium text-[#1A1A1A]">Total paid</span>
+                <span className="text-[16px] font-medium text-[#1A1A1A]">${order.total}</span>
               </div>
 
-              <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-500/10 px-3 py-2 rounded-full w-fit">
+              <div className="flex items-center gap-2 text-[11px] text-emerald-600 bg-emerald-50 px-3 py-2 border border-emerald-100 w-fit">
                 <ShieldCheck size={12} />
-                Payment Verified via Stripe
+                Payment verified via Stripe
               </div>
             </motion.div>
           )}
@@ -283,16 +283,16 @@ const CheckoutSuccess = () => {
           >
             <Link
               to="/orders"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-primary/90 transition-all active:scale-95"
+              className="inline-flex items-center gap-2 bg-[#1A1A1A] text-white px-6 py-3.5 text-[13px] font-medium hover:bg-[#333] transition-colors"
             >
-              <ShoppingBag size={16} />
-              View My Orders
+              <ShoppingBag size={14} />
+              View my orders
             </Link>
             <Link
               to="/shop"
-              className="inline-flex items-center gap-2 border border-border px-8 py-4 rounded-sm font-black uppercase tracking-widest text-xs hover:bg-muted transition-all"
+              className="inline-flex items-center gap-2 border border-[#E8E5E0] px-6 py-3.5 text-[13px] font-medium hover:bg-[#FAF9F7] transition-colors text-[#1A1A1A]"
             >
-              Continue Shopping
+              Continue shopping
               <ArrowRight size={14} />
             </Link>
           </motion.div>

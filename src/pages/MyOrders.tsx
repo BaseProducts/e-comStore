@@ -78,34 +78,34 @@ const MyOrders = () => {
                     className="max-w-4xl mx-auto"
                 >
                     <div className="flex items-center gap-4 mb-12">
-                        <div className="w-12 h-12 rounded-full gradient-btn flex items-center justify-center shadow-lg shadow-primary/20">
+                        <div className="w-12 h-12 bg-[#1A1A1A] flex items-center justify-center shrink-0">
                             <ShoppingBag size={24} className="text-white" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black uppercase tracking-tighter italic">Your Orders</h1>
-                            <p className="text-xs font-bold text-muted-foreground tracking-widest uppercase mt-1">Track and manage your purchases</p>
+                            <h1 className="text-[28px] md:text-[36px] font-medium tracking-tight text-[#1A1A1A]">Your Orders</h1>
+                            <p className="text-[13px] text-[#8A8A8A] mt-1">Track and manage your purchases</p>
                         </div>
                     </div>
 
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                            <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground animate-pulse">Loading order history...</p>
+                            <div className="w-8 h-8 border-2 border-[#E8E5E0] border-t-[#1A1A1A] rounded-full animate-spin"></div>
+                            <p className="text-[12px] text-[#8A8A8A] font-medium">Loading orders...</p>
                         </div>
                     ) : orders.length === 0 ? (
                         <motion.div 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="bg-muted/30 border border-dashed border-border rounded-lg p-20 text-center"
+                            className="bg-white border border-[#E8E5E0] p-20 text-center"
                         >
-                            <ShoppingBag size={48} className="mx-auto mb-6 text-muted-foreground/30 stroke-1" />
-                            <h2 className="text-lg font-black uppercase tracking-tight mb-2">No orders found yet</h2>
-                            <p className="text-xs text-muted-foreground max-w-xs mx-auto mb-8 font-bold leading-relaxed">
-                                Looks like you haven't made any purchases with us. Check out our latest collection!
+                            <ShoppingBag size={40} className="mx-auto mb-5 text-[#D5D0CA] stroke-1" />
+                            <h2 className="text-[18px] font-medium text-[#1A1A1A] mb-2">No orders found</h2>
+                            <p className="text-[13px] text-[#8A8A8A] max-w-xs mx-auto mb-8 leading-relaxed">
+                                You haven't made any purchases yet. Check out our latest collection!
                             </p>
                             <Link 
                                 to="/shop" 
-                                className="inline-flex items-center gap-2 gradient-btn px-8 py-3 rounded-sm font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+                                className="inline-flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#333] text-white px-6 py-3 text-[13px] font-medium transition-colors"
                             >
                                 Start Shopping <ChevronRight size={14} />
                             </Link>
@@ -118,48 +118,48 @@ const MyOrders = () => {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: idx * 0.1 }}
-                                    className="bg-background border border-border/60 rounded-sm overflow-hidden group hover:border-primary/50 transition-colors shadow-sm"
+                                    className="bg-white border border-[#E8E5E0]"
                                 >
                                     {/* Order Header */}
-                                    <div className="p-5 border-b border-border/40 bg-muted/20 flex flex-wrap items-center justify-between gap-4">
-                                        <div className="flex items-center gap-6">
+                                    <div className="p-5 border-b border-[#E8E5E0] bg-[#FAF9F7] flex flex-wrap items-center justify-between gap-4">
+                                        <div className="flex flex-wrap items-center gap-8">
                                             <div>
-                                                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Order ID</p>
-                                                <p className="text-[10px] font-mono font-black truncate max-w-[120px] uppercase">#{order.id.split('-')[0]}</p>
+                                                <p className="text-[11px] text-[#8A8A8A] mb-1">Order ID</p>
+                                                <p className="text-[13px] font-medium text-[#1A1A1A]">#{order.id.split('-')[0]}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Date</p>
-                                                <p className="text-[10px] font-bold">{new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
+                                                <p className="text-[11px] text-[#8A8A8A] mb-1">Date</p>
+                                                <p className="text-[13px] font-medium text-[#1A1A1A]">{new Date(order.createdAt).toLocaleDateString('en-GB')}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Total</p>
-                                                <p className="text-[10px] font-black text-primary">${order.total}</p>
+                                                <p className="text-[11px] text-[#8A8A8A] mb-1">Total</p>
+                                                <p className="text-[13px] font-medium text-[#1A1A1A]">${order.total}</p>
                                             </div>
                                             <div>
-                                                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] mb-1">Payment</p>
-                                                <div className="flex items-center gap-1.5">
-                                                    <p className="text-[10px] font-bold uppercase">Stripe</p>
-                                                    <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full ${
-                                                        order.paymentStatus === 'paid' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'
+                                                <p className="text-[11px] text-[#8A8A8A] mb-1">Payment</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-[13px] font-medium text-[#1A1A1A]">Stripe</p>
+                                                    <span className={`text-[10px] px-2 py-0.5 border ${
+                                                        order.paymentStatus === 'paid' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-amber-50 border-amber-100 text-amber-600'
                                                     }`}>
                                                         {order.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 bg-background border border-border px-3 py-1.5 rounded-full">
+                                        <div className="flex items-center gap-2 bg-white border border-[#E8E5E0] px-3 py-1.5">
                                             {getStatusIcon(order.status)}
-                                            <span className="text-[9px] font-black uppercase tracking-widest">{order.status}</span>
+                                            <span className="text-[11px] font-medium text-[#1A1A1A] capitalize">{order.status}</span>
                                         </div>
                                     </div>
 
                                     {/* Status Message */}
                                     {order.statusMessage && (
-                                        <div className="px-5 py-3 bg-primary/5 border-b border-border/40 flex items-start gap-3">
-                                            <MessageSquare size={14} className="text-primary mt-0.5 shrink-0" />
+                                        <div className="px-5 py-4 bg-[#FAF9F7] border-b border-[#E8E5E0] flex items-start gap-3">
+                                            <MessageSquare size={16} className="text-[#8A8A8A] shrink-0" />
                                             <div>
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-0.5">Admin Update</p>
-                                                <p className="text-xs text-zinc-700 font-medium italic leading-relaxed">{order.statusMessage}</p>
+                                                <p className="text-[11px] text-[#8A8A8A] mb-1">Admin Update</p>
+                                                <p className="text-[13px] text-[#1A1A1A] font-medium leading-relaxed">{order.statusMessage}</p>
                                             </div>
                                         </div>
                                     )}
@@ -177,36 +177,36 @@ const MyOrders = () => {
 
                                                 return (
                                                     <div key={item.id} className="flex items-center gap-4">
-                                                        <div className="w-16 h-20 rounded bg-muted overflow-hidden border border-border/40 shrink-0">
+                                                        <div className="w-16 h-20 bg-[#F0EDE8] overflow-hidden border border-[#E8E5E0] shrink-0">
                                                             <img 
                                                                 src={item.image || "/placeholder.jpg"} 
                                                                 alt={item.name} 
-                                                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                                className="w-full h-full object-cover"
                                                             />
                                                         </div>
                                                         <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                                                             <div>
-                                                                <h3 className="text-xs font-black uppercase tracking-tight mb-1">{item.name}</h3>
-                                                                <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                                                                    <span className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
-                                                                        <span className="opacity-60">SIZE:</span> {item.size}
+                                                                <h3 className="text-[13px] font-medium text-[#1A1A1A] mb-1.5">{item.name}</h3>
+                                                                <div className="flex flex-wrap items-center gap-2">
+                                                                    <span className="text-[11px] text-[#8A8A8A] border border-[#E8E5E0] px-2 py-0.5">
+                                                                        Size: {item.size}
                                                                     </span>
                                                                     {item.color && (
-                                                                        <span className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
-                                                                            <span className="opacity-60">COLOR:</span> {item.color}
+                                                                        <span className="text-[11px] text-[#8A8A8A] border border-[#E8E5E0] px-2 py-0.5">
+                                                                            Color: {item.color}
                                                                         </span>
                                                                     )}
                                                                     {Object.entries(customFieldsData).map(([key, value]) => (
-                                                                        <span key={key} className="text-[9px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase flex items-center gap-1">
-                                                                            <span className="opacity-60">{key}:</span> {value}
+                                                                        <span key={key} className="text-[11px] text-[#8A8A8A] border border-[#E8E5E0] px-2 py-0.5">
+                                                                            {key}: {value}
                                                                         </span>
                                                                     ))}
-                                                                    <span className="text-[9px] font-black text-primary bg-primary/10 px-1.5 py-0.5 rounded uppercase">
-                                                                        QTY: {item.quantity}
+                                                                    <span className="text-[11px] text-[#1A1A1A] bg-[#FAF9F7] border border-[#E8E5E0] px-2 py-0.5">
+                                                                        Qty: {item.quantity}
                                                                     </span>
                                                                 </div>
                                                             </div>
-                                                            <p className="text-xs font-black">${item.price * item.quantity}</p>
+                                                            <p className="text-[14px] font-medium text-[#1A1A1A]">${item.price * item.quantity}</p>
                                                         </div>
                                                     </div>
                                                 );
