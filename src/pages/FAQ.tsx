@@ -97,7 +97,7 @@ const FAQ = () => {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                       >
-                        <div className="p-4 md:p-6 pt-0 md:pt-0 text-[12px] md:text-[14px] text-[#4A4A4A] leading-relaxed border-t border-[#E8E5E0] mt-1 pt-4 md:pt-5 whitespace-pre-wrap">
+                        <div className="p-4 md:p-6 text-[12px] md:text-[14px] text-[#4A4A4A] leading-relaxed border-t border-[#E8E5E0] mt-1 pt-4 md:pt-5 whitespace-pre-wrap">
                           {faq.answer}
                         </div>
                       </motion.div>
